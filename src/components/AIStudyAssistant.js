@@ -1,34 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Initialize Gemini API with error handling
-const initializeAI = () => {
-  try {
-    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-    console.log('API Key available:', !!apiKey); // Debug log
-    
-    if (!apiKey) {
-      throw new Error('Gemini API key is missing');
-    }
-
-    // Verify API key format (should be a non-empty string)
-    if (typeof apiKey !== 'string' || apiKey.trim() === '') {
-      throw new Error('Invalid API key format');
-    }
-
-    const ai = new GoogleGenerativeAI(apiKey);
-    
-    // Test the API instance
-    if (!ai || typeof ai.getGenerativeModel !== 'function') {
-      throw new Error('Invalid AI instance created');
-    }
-
-    return ai;
-  } catch (error) {
-    console.error('Error initializing Gemini API:', error);
-    return null;
-  }
-};
+// Initialize Gemini API with your API key directly
+// In a production environment, you should handle this more securely
+const API_KEY = "AIzaSyC-r-k3uCfZ367p-FElkHuv6NDUnLSThms"; // Replace with your actual API key
+const genAI = new GoogleGenerativeAI(API_KEY);
 
 export default function AIStudyAssistant() {
   const [messages, setMessages] = useState([
@@ -42,30 +18,18 @@ export default function AIStudyAssistant() {
   const [selectedSubject, setSelectedSubject] = useState('general');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [genAI, setGenAI] = useState(null);
+  const [model, setModel] = useState(null);
 
-  // Initialize AI on component mount
+  // Initialize the model on component mount
   useEffect(() => {
-    const initAI = async () => {
-      try {
-        const ai = initializeAI();
-        if (!ai) {
-          throw new Error('Failed to initialize AI service');
-        }
-
-        // Test the API with a simple request
-        const model = ai.getGenerativeModel({ model: "gemini-pro" });
-        await model.generateContent("Test connection");
-
-        setGenAI(ai);
-        setError(null);
-      } catch (err) {
-        console.error('AI initialization error:', err);
-        setError(`AI service initialization failed: ${err.message}`);
-      }
-    };
-
-    initAI();
+    try {
+      const geminiModel = genAI.getGenerativeModel({ model: "gemini-pro" });
+      setModel(geminiModel);
+      setError(null);
+    } catch (err) {
+      console.error('Model initialization error:', err);
+      setError('Failed to initialize AI model. Please check your configuration.');
+    }
   }, []);
 
   const subjects = [
@@ -81,22 +45,6 @@ export default function AIStudyAssistant() {
     { id: 'languages', name: 'Languages', icon: '🌎' }
   ];
 
-  const generatePrompt = (userInput, subject) => {
-    const currentSubject = subjects.find(s => s.id === subject).name;
-    return {
-      contents: [{
-        role: "user",
-        parts: [{
-          text: `You are a helpful and knowledgeable study assistant specializing in ${currentSubject}. 
-          Provide clear, accurate, and educational responses.
-          If the question is about a different subject, still try to help but mention that you specialize in ${currentSubject}.
-          
-          Question: ${userInput}`
-        }]
-      }]
-    };
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -104,9 +52,9 @@ export default function AIStudyAssistant() {
     // Clear any previous errors
     setError(null);
 
-    // Check if API is properly initialized
-    if (!genAI) {
-      setError('AI service is not properly initialized. Please check your configuration.');
+    // Check if model is properly initialized
+    if (!model) {
+      setError('AI model is not properly initialized. Please refresh the page.');
       return;
     }
 
@@ -116,9 +64,6 @@ export default function AIStudyAssistant() {
     setIsLoading(true);
 
     try {
-      // Generate content with Gemini
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-      
       const prompt = `You are a helpful and knowledgeable study assistant specializing in ${
         subjects.find(s => s.id === selectedSubject).name
       }. Please provide a clear and educational response to this question: ${input}`;
