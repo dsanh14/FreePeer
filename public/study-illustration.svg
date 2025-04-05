@@ -12,8 +12,8 @@
       75% { transform: translate(-5px, -5px); }
     }
     @keyframes pulse {
-      0%, 100% { opacity: 0.3; }
-      50% { opacity: 0.5; }
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.6; }
     }
     @keyframes shimmer {
       0% { opacity: 0.8; }
@@ -55,37 +55,37 @@
   <!-- Decorative Elements (Background) -->
   <g transform="translate(150, 150)" class="pulsing">
     <g class="floating-circle" style="animation-delay: 0s">
-      <circle cx="50" cy="50" r="25" fill="#0EA5E9" opacity="0.4"/>
+      <circle cx="0" cy="50" r="25" fill="#0EA5E9" opacity="0.5"/>
     </g>
     <g class="floating-circle" style="animation-delay: 0.5s">
-      <circle cx="150" cy="120" r="20" fill="#0284C7" opacity="0.4"/>
+      <circle cx="100" cy="120" r="20" fill="#0284C7" opacity="0.5"/>
     </g>
     <g class="floating-circle" style="animation-delay: 1s">
-      <circle cx="80" cy="200" r="30" fill="#0369A1" opacity="0.4"/>
+      <circle cx="200" cy="200" r="30" fill="#0369A1" opacity="0.5"/>
     </g>
     <g class="floating-circle" style="animation-delay: 1.5s">
-      <circle cx="450" cy="80" r="35" fill="#0284C7" opacity="0.4"/>
+      <circle cx="300" cy="80" r="35" fill="#0284C7" opacity="0.5"/>
     </g>
     <g class="floating-circle" style="animation-delay: 2s">
-      <circle cx="520" cy="180" r="25" fill="#0EA5E9" opacity="0.4"/>
+      <circle cx="400" cy="180" r="25" fill="#0EA5E9" opacity="0.5"/>
     </g>
     <g class="floating-circle" style="animation-delay: 2.5s">
-      <circle cx="400" cy="250" r="30" fill="#0369A1" opacity="0.4"/>
+      <circle cx="500" cy="250" r="30" fill="#0369A1" opacity="0.5"/>
     </g>
     <g class="floating-circle" style="animation-delay: 0.7s">
-      <circle cx="180" cy="350" r="40" fill="#0369A1" opacity="0.4"/>
+      <circle cx="600" cy="350" r="40" fill="#0369A1" opacity="0.5"/>
     </g>
     <g class="floating-circle" style="animation-delay: 1.2s">
-      <circle cx="420" cy="320" r="30" fill="#0284C7" opacity="0.4"/>
+      <circle cx="700" cy="320" r="30" fill="#0284C7" opacity="0.5"/>
     </g>
     <g class="floating-circle" style="animation-delay: 1.7s">
-      <circle cx="300" cy="400" r="25" fill="#0EA5E9" opacity="0.4"/>
+      <circle cx="800" cy="400" r="25" fill="#0EA5E9" opacity="0.5"/>
     </g>
     <g class="floating-circle" style="animation-delay: 0.3s">
-      <circle cx="250" cy="280" r="35" fill="#0284C7" opacity="0.4"/>
+      <circle cx="900" cy="280" r="35" fill="#0284C7" opacity="0.5"/>
     </g>
     <g class="floating-circle" style="animation-delay: 0.9s">
-      <circle cx="350" cy="150" r="28" fill="#0EA5E9" opacity="0.4"/>
+      <circle cx="1000" cy="150" r="28" fill="#0EA5E9" opacity="0.5"/>
     </g>
   </g>
   
