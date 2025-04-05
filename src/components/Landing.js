@@ -17,14 +17,16 @@ export default function Landing() {
         svg.style.opacity = '1';
         svg.style.transform = 'translateY(0)';
         
-        // Calculate scroll progress
-        const progress = Math.min(1, Math.max(0, (window.innerHeight - rect.top) / rect.height));
+        // Calculate scroll progress based on the visible portion of the SVG
+        const progress = Math.min(1, Math.max(0, 
+          (window.innerHeight - rect.top) / (rect.height * 0.5) // Only use top half for progress
+        ));
         setScrollProgress(progress);
         
         // Update progress bar width
-        const progressBar = svg.querySelector('.progress-bar');
+        const progressBar = document.getElementById('progress-bar');
         if (progressBar) {
-          progressBar.style.width = `${progress * 300}px`;
+          progressBar.style.width = `${progress * 450}px`; // Full width of container
         }
       } else {
         svg.style.opacity = '0';
@@ -32,10 +34,22 @@ export default function Landing() {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    // Use requestAnimationFrame for smoother animations
+    let ticking = false;
+    const scrollHandler = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', scrollHandler, { passive: true });
     handleScroll(); // Initial check
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', scrollHandler);
   }, []);
 
   return (
