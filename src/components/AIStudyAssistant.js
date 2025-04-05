@@ -9,7 +9,7 @@ import 'katex/dist/katex.min.css';
 
 // Initialize Gemini API with your API key directly
 // In a production environment, you should handle this more securely
-const API_KEY = "AIzaSyC-r-k3uCfZ367p-FElkHuv6NDUnLSThms"; // Replace with your actual API key
+const API_KEY = "YOUR_GEMINI_API_KEY"; // Replace with your actual API key
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 export default function AIStudyAssistant() {
@@ -125,11 +125,73 @@ export default function AIStudyAssistant() {
       <SyntaxHighlighter
         language={language}
         style={atomDark}
-        className="rounded-md text-sm"
+        PreTag="div"
+        className="rounded-md my-2"
       >
         {value}
       </SyntaxHighlighter>
     );
+  };
+
+  const MarkdownComponents = {
+    code: ({ node, inline, className, children, ...props }) => {
+      const match = /language-(\w+)/.exec(className || '');
+      return !inline && match ? (
+        <CodeBlock
+          language={match[1]}
+          value={String(children).replace(/\n$/, '')}
+        />
+      ) : (
+        <code className="bg-gray-100 rounded px-1 py-0.5" {...props}>
+          {children}
+        </code>
+      );
+    },
+    p: ({ children }) => <p className="mb-2 leading-relaxed">{children}</p>,
+    ul: ({ children }) => <ul className="list-disc ml-4 mb-2 space-y-1">{children}</ul>,
+    ol: ({ children }) => <ol className="list-decimal ml-4 mb-2 space-y-1">{children}</ol>,
+    li: ({ children }) => <li>{children}</li>,
+    blockquote: ({ children }) => (
+      <blockquote className="border-l-4 border-blue-500 pl-4 italic my-2">
+        {children}
+      </blockquote>
+    ),
+    table: ({ children }) => (
+      <div className="overflow-x-auto my-2">
+        <table className="min-w-full divide-y divide-gray-200">
+          {children}
+        </table>
+      </div>
+    ),
+    th: ({ children }) => (
+      <th className="px-3 py-2 bg-gray-100 font-semibold text-left">
+        {children}
+      </th>
+    ),
+    td: ({ children }) => (
+      <td className="px-3 py-2 border-t">
+        {children}
+      </td>
+    ),
+    a: ({ children, href }) => (
+      <a href={href} className="text-blue-500 hover:text-blue-600 underline">
+        {children}
+      </a>
+    ),
+    strong: ({ children }) => (
+      <strong className="font-semibold">
+        {children}
+      </strong>
+    ),
+    em: ({ children }) => (
+      <em className="italic">
+        {children}
+      </em>
+    ),
+    hr: () => <hr className="my-4 border-t border-gray-200" />,
+    img: ({ src, alt }) => (
+      <img src={src} alt={alt} className="max-w-full h-auto rounded-lg my-2" />
+    )
   };
 
   return (
@@ -193,54 +255,15 @@ export default function AIStudyAssistant() {
                 }`}
               >
                 {message.sender === 'assistant' ? (
-                  <ReactMarkdown
-                    remarkPlugins={[remarkMath]}
-                    rehypePlugins={[rehypeKatex]}
-                    components={{
-                      code: ({ node, inline, className, children, ...props }) => {
-                        const match = /language-(\w+)/.exec(className || '');
-                        return !inline && match ? (
-                          <CodeBlock
-                            language={match[1]}
-                            value={String(children).replace(/\n$/, '')}
-                            {...props}
-                          />
-                        ) : (
-                          <code className="bg-gray-100 rounded px-1 py-0.5" {...props}>
-                            {children}
-                          </code>
-                        );
-                      },
-                      // Style other markdown elements
-                      p: ({ children }) => <p className="mb-2">{children}</p>,
-                      ul: ({ children }) => <ul className="list-disc ml-4 mb-2">{children}</ul>,
-                      ol: ({ children }) => <ol className="list-decimal ml-4 mb-2">{children}</ol>,
-                      li: ({ children }) => <li className="mb-1">{children}</li>,
-                      blockquote: ({ children }) => (
-                        <blockquote className="border-l-4 border-blue-500 pl-4 italic my-2">
-                          {children}
-                        </blockquote>
-                      ),
-                      table: ({ children }) => (
-                        <div className="overflow-x-auto my-2">
-                          <table className="min-w-full divide-y divide-gray-200">
-                            {children}
-                          </table>
-                        </div>
-                      ),
-                      th: ({ children }) => (
-                        <th className="px-3 py-2 bg-gray-100 font-semibold text-left">
-                          {children}
-                        </th>
-                      ),
-                      td: ({ children }) => (
-                        <td className="px-3 py-2 border-t">{children}</td>
-                      ),
-                    }}
-                    className="prose prose-sm max-w-none prose-pre:p-0"
-                  >
-                    {message.text}
-                  </ReactMarkdown>
+                  <div className="prose prose-sm max-w-none">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkMath]}
+                      rehypePlugins={[rehypeKatex]}
+                      components={MarkdownComponents}
+                    >
+                      {message.text}
+                    </ReactMarkdown>
+                  </div>
                 ) : (
                   message.text
                 )}
