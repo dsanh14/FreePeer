@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Profile() {
   const { user } = useAuth();
+  const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const [showOverlay, setShowOverlay] = useState(false);
 
   // Sample user stats - in a real app, these would come from a database
   const userStats = {
@@ -18,13 +20,48 @@ export default function Profile() {
       { name: 'Expert', icon: '🎓', description: 'Answered 30 questions correctly' }
     ],
     recentActivity: [
-      { type: 'answer', title: 'How to solve quadratic equations?', date: '2024-03-15' },
-      { type: 'question', title: 'Best resources for learning Python?', date: '2024-03-14' },
-      { type: 'answer', title: 'Understanding React Hooks', date: '2024-03-13' }
+      { 
+        type: 'question', 
+        title: 'How to solve quadratic equations?', 
+        content: 'I\'m having trouble understanding how to solve quadratic equations using the quadratic formula. Can someone explain it step by step?',
+        date: '2024-03-15',
+        answers: [
+          {
+            author: 'Jane Smith',
+            content: 'The quadratic formula is x = (-b ± √(b² - 4ac)) / 2a. Let me break it down step by step...',
+            date: '2024-03-15'
+          }
+        ]
+      },
+      { 
+        type: 'answer', 
+        title: 'Best resources for learning Python?', 
+        content: 'I recommend starting with Python.org\'s official tutorial and then moving to Codecademy\'s Python course.',
+        date: '2024-03-14',
+        questionId: 2
+      },
+      { 
+        type: 'question', 
+        title: 'Understanding React Hooks', 
+        content: 'Can someone explain the difference between useState and useEffect hooks in React?',
+        date: '2024-03-13',
+        answers: [
+          {
+            author: 'Mike Johnson',
+            content: 'useState is used for managing state in functional components, while useEffect is used for handling side effects...',
+            date: '2024-03-13'
+          }
+        ]
+      }
     ]
   };
 
   const xpPercentage = (userStats.xp / userStats.nextLevelXp) * 100;
+
+  const handleQuestionClick = (activity) => {
+    setSelectedQuestion(activity);
+    setShowOverlay(true);
+  };
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] p-6">
@@ -94,7 +131,11 @@ export default function Profile() {
           <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Activity</h2>
           <div className="space-y-4">
             {userStats.recentActivity.map((activity, index) => (
-              <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div
+                key={index}
+                onClick={() => handleQuestionClick(activity)}
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+              >
                 <div className="flex items-center space-x-3">
                   <span className="text-xl">
                     {activity.type === 'answer' ? '💬' : '❓'}
@@ -112,6 +153,52 @@ export default function Profile() {
           </div>
         </div>
       </div>
+
+      {/* Question Overlay */}
+      {showOverlay && selectedQuestion && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] flex flex-col">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-start">
+                <h2 className="text-2xl font-bold text-gray-900">{selectedQuestion.title}</h2>
+                <button
+                  onClick={() => setShowOverlay(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-gray-600 mt-4">{selectedQuestion.content}</p>
+              <div className="flex items-center justify-between text-sm text-gray-500 mt-4">
+                <span>By {user?.displayName || 'Anonymous User'}</span>
+                <span>{selectedQuestion.date}</span>
+              </div>
+            </div>
+
+            {/* Answers Section */}
+            {selectedQuestion.answers && selectedQuestion.answers.length > 0 && (
+              <div className="flex-1 overflow-y-auto px-6 py-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  {selectedQuestion.answers.length} {selectedQuestion.answers.length === 1 ? 'Answer' : 'Answers'}
+                </h3>
+                <div className="space-y-4">
+                  {selectedQuestion.answers.map((answer, index) => (
+                    <div key={index} className="bg-gray-50 rounded-lg p-4">
+                      <p className="text-gray-600 mb-2">{answer.content}</p>
+                      <div className="flex items-center justify-between text-sm text-gray-500">
+                        <span>By {answer.author}</span>
+                        <span>{answer.date}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

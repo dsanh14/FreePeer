@@ -1,12 +1,11 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useLocation, NavLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { NavLink } from 'react-router-dom';
 
 export default function Layout({ children }) {
   const { currentUser, logout } = useAuth();
   const location = useLocation();
-  const isAuthPage = ['/login', '/signup'].includes(location.pathname);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -17,119 +16,142 @@ export default function Layout({ children }) {
   };
 
   // Don't show the header on auth pages
-  if (isAuthPage) {
+  if (['/login', '/signup'].includes(location.pathname)) {
     return <>{children}</>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200">
+      <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex">
-              <Link to="/" className="flex-shrink-0 flex items-center">
-                <span className="text-2xl font-bold text-[#3B82F6]">StudyBuddy Connect</span>
-              </Link>
-              {currentUser && (
-                <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                  <NavLink
-                    to="/dashboard"
-                    className={({ isActive }) =>
-                      `text-sm font-medium ${
-                        isActive ? 'text-[#3B82F6]' : 'text-gray-600 hover:text-gray-900'
-                      }`
-                    }
-                  >
-                    Dashboard
-                  </NavLink>
-                  <NavLink
-                    to="/find-tutors"
-                    className={({ isActive }) =>
-                      `text-sm font-medium ${
-                        isActive ? 'text-[#3B82F6]' : 'text-gray-600 hover:text-gray-900'
-                      }`
-                    }
-                  >
-                    Find Tutors
-                  </NavLink>
-                  <NavLink
-                    to="/resources"
-                    className={({ isActive }) =>
-                      `text-sm font-medium ${
-                        isActive ? 'text-[#3B82F6]' : 'text-gray-600 hover:text-gray-900'
-                      }`
-                    }
-                  >
-                    Resources
-                  </NavLink>
-                  <NavLink
-                    to="/qa-forum"
-                    className={({ isActive }) =>
-                      `text-sm font-medium ${
-                        isActive ? 'text-[#3B82F6]' : 'text-gray-600 hover:text-gray-900'
-                      }`
-                    }
-                  >
-                    Q&A Forum
-                  </NavLink>
-                  <NavLink
-                    to="/ai-assistant"
-                    className={({ isActive }) =>
-                      `text-sm font-medium ${
-                        isActive ? 'text-[#3B82F6]' : 'text-gray-600 hover:text-gray-900'
-                      }`
-                    }
-                  >
-                    AI Assistant
-                  </NavLink>
-                  <NavLink
-                    to="/leaderboard"
-                    className={({ isActive }) =>
-                      `text-sm font-medium ${
-                        isActive ? 'text-[#3B82F6]' : 'text-gray-600 hover:text-gray-900'
-                      }`
-                    }
-                  >
-                    Leaderboard
-                  </NavLink>
-                  <NavLink
-                    to="/profile"
-                    className={({ isActive }) =>
-                      `text-sm font-medium ${
-                        isActive ? 'text-[#3B82F6]' : 'text-gray-600 hover:text-gray-900'
-                      }`
-                    }
-                  >
-                    Profile
-                  </NavLink>
-                </div>
-              )}
+              <div className="flex-shrink-0 flex items-center">
+                <Link to="/" className="text-2xl font-bold text-[#3B82F6]">
+                  FreePeer
+                </Link>
+              </div>
+              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+                <NavLink
+                  to="/dashboard"
+                  className={({ isActive }) =>
+                    `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                      isActive
+                        ? 'border-[#3B82F6] text-gray-900'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                    }`
+                  }
+                >
+                  Dashboard
+                </NavLink>
+                <NavLink
+                  to="/find-tutors"
+                  className={({ isActive }) =>
+                    `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                      isActive
+                        ? 'border-[#3B82F6] text-gray-900'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                    }`
+                  }
+                >
+                  Find Tutors
+                </NavLink>
+                <NavLink
+                  to="/resources"
+                  className={({ isActive }) =>
+                    `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                      isActive
+                        ? 'border-[#3B82F6] text-gray-900'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                    }`
+                  }
+                >
+                  Resources
+                </NavLink>
+                <NavLink
+                  to="/qa-forum"
+                  className={({ isActive }) =>
+                    `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                      isActive
+                        ? 'border-[#3B82F6] text-gray-900'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                    }`
+                  }
+                >
+                  Q&A Forum
+                </NavLink>
+                <NavLink
+                  to="/ai-assistant"
+                  className={({ isActive }) =>
+                    `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                      isActive
+                        ? 'border-[#3B82F6] text-gray-900'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                    }`
+                  }
+                >
+                  AI Assistant
+                </NavLink>
+                <NavLink
+                  to="/leaderboard"
+                  className={({ isActive }) =>
+                    `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                      isActive
+                        ? 'border-[#3B82F6] text-gray-900'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                    }`
+                  }
+                >
+                  Leaderboard
+                </NavLink>
+              </div>
             </div>
             <div className="flex items-center">
-              {!currentUser ? (
+              {currentUser ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setShowProfileMenu(!showProfileMenu)}
+                    className="flex items-center space-x-2 focus:outline-none"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-[#3B82F6] text-white flex items-center justify-center text-sm font-medium">
+                      {currentUser.displayName?.[0] || '?'}
+                    </div>
+                  </button>
+                  {showProfileMenu && (
+                    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                      <div className="py-1">
+                        <NavLink
+                          to="/profile"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setShowProfileMenu(false)}
+                        >
+                          Your Profile
+                        </NavLink>
+                        <button
+                          onClick={handleLogout}
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          Sign out
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
                 <div className="flex space-x-4">
                   <Link
                     to="/login"
                     className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
                   >
-                    Log In
+                    Log in
                   </Link>
                   <Link
                     to="/signup"
-                    className="bg-[#3B82F6] text-white hover:bg-[#2563EB] px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                    className="bg-[#3B82F6] text-white hover:bg-[#2563EB] px-4 py-2 rounded-md text-sm font-medium"
                   >
-                    Sign Up
+                    Sign up
                   </Link>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-4">
-                  <button
-                    onClick={handleLogout}
-                    className="w-8 h-8 rounded-full bg-[#3B82F6] text-white flex items-center justify-center text-sm font-medium"
-                  >
-                    {currentUser.displayName?.[0] || '?'}
-                  </button>
                 </div>
               )}
             </div>
