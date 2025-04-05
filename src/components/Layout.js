@@ -34,7 +34,7 @@ export default function Layout({ children }) {
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                 <NavLink
-                  to="/dashboard"
+                  to="/home"
                   className={({ isActive }) =>
                     `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                       isActive
@@ -43,7 +43,7 @@ export default function Layout({ children }) {
                     }`
                   }
                 >
-                  Dashboard
+                  Home
                 </NavLink>
                 <NavLink
                   to="/find-tutors"
@@ -58,7 +58,7 @@ export default function Layout({ children }) {
                   Find Tutors
                 </NavLink>
                 <NavLink
-                  to="/resources"
+                  to="/study-resources"
                   className={({ isActive }) =>
                     `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                       isActive
@@ -82,7 +82,7 @@ export default function Layout({ children }) {
                   Q&A Forum
                 </NavLink>
                 <NavLink
-                  to="/ai-assistant"
+                  to="/ai-study-assistant"
                   className={({ isActive }) =>
                     `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                       isActive
