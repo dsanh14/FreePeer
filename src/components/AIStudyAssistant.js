@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 // Initialize Gemini API with your API key directly
 // In a production environment, you should handle this more securely
@@ -45,6 +51,28 @@ export default function AIStudyAssistant() {
     { id: 'languages', name: 'Languages', icon: '🌎' }
   ];
 
+  const generatePrompt = (userInput, subject) => {
+    const currentSubject = subjects.find(s => s.id === subject).name;
+    return `You are a helpful and knowledgeable study assistant specializing in ${currentSubject}. 
+    Please provide clear, educational responses using rich formatting:
+
+    - Use **bold** for important terms
+    - Use *italics* for emphasis
+    - Use \`code blocks\` for formulas, equations, or code snippets
+    - Use bullet points or numbered lists for steps or multiple points
+    - Use mathematical notation when appropriate (e.g., \$E = mc^2\$)
+    - Include examples with proper formatting
+    - Use tables when comparing multiple items
+    - Use > for important notes or quotes
+
+    If providing code examples, use proper syntax highlighting by specifying the language:
+    \`\`\`python
+    # Example code
+    \`\`\`
+
+    Question: ${userInput}`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -64,10 +92,7 @@ export default function AIStudyAssistant() {
     setIsLoading(true);
 
     try {
-      const prompt = `You are a helpful and knowledgeable study assistant specializing in ${
-        subjects.find(s => s.id === selectedSubject).name
-      }. Please provide a clear and educational response to this question: ${input}`;
-
+      const prompt = generatePrompt(input, selectedSubject);
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
@@ -92,6 +117,19 @@ export default function AIStudyAssistant() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Custom renderer for code blocks
+  const CodeBlock = ({ language, value }) => {
+    return (
+      <SyntaxHighlighter
+        language={language}
+        style={atomDark}
+        className="rounded-md text-sm"
+      >
+        {value}
+      </SyntaxHighlighter>
+    );
   };
 
   return (
@@ -140,7 +178,7 @@ export default function AIStudyAssistant() {
           )}
         </div>
 
-        {/* Chat Area */}
+        {/* Chat Area with rich text support */}
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
           {messages.map((message) => (
             <div
@@ -154,7 +192,58 @@ export default function AIStudyAssistant() {
                     : 'bg-gray-50 text-gray-900'
                 }`}
               >
-                {message.text}
+                {message.sender === 'assistant' ? (
+                  <ReactMarkdown
+                    remarkPlugins={[remarkMath]}
+                    rehypePlugins={[rehypeKatex]}
+                    components={{
+                      code: ({ node, inline, className, children, ...props }) => {
+                        const match = /language-(\w+)/.exec(className || '');
+                        return !inline && match ? (
+                          <CodeBlock
+                            language={match[1]}
+                            value={String(children).replace(/\n$/, '')}
+                            {...props}
+                          />
+                        ) : (
+                          <code className="bg-gray-100 rounded px-1 py-0.5" {...props}>
+                            {children}
+                          </code>
+                        );
+                      },
+                      // Style other markdown elements
+                      p: ({ children }) => <p className="mb-2">{children}</p>,
+                      ul: ({ children }) => <ul className="list-disc ml-4 mb-2">{children}</ul>,
+                      ol: ({ children }) => <ol className="list-decimal ml-4 mb-2">{children}</ol>,
+                      li: ({ children }) => <li className="mb-1">{children}</li>,
+                      blockquote: ({ children }) => (
+                        <blockquote className="border-l-4 border-blue-500 pl-4 italic my-2">
+                          {children}
+                        </blockquote>
+                      ),
+                      table: ({ children }) => (
+                        <div className="overflow-x-auto my-2">
+                          <table className="min-w-full divide-y divide-gray-200">
+                            {children}
+                          </table>
+                        </div>
+                      ),
+                      th: ({ children }) => (
+                        <th className="px-3 py-2 bg-gray-100 font-semibold text-left">
+                          {children}
+                        </th>
+                      ),
+                      td: ({ children }) => (
+                        <td className="px-3 py-2 border-t">{children}</td>
+                      ),
+                    }}
+                    className="prose prose-sm max-w-none prose-pre:p-0"
+                  >
+                    {message.text}
+                  </ReactMarkdown>
+                ) : (
+                  message.text
+                )}
               </div>
             </div>
           ))}
