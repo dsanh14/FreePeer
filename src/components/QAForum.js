@@ -1,184 +1,198 @@
 import React, { useState } from 'react';
 
 export default function QAForum() {
-  const [questions, setQuestions] = useState([
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const categories = [
+    { id: 'all', name: 'All Questions', icon: '📚' },
+    { id: 'math', name: 'Mathematics', icon: '🔢' },
+    { id: 'science', name: 'Science', icon: '🔬' },
+    { id: 'english', name: 'English', icon: '📝' },
+    { id: 'cs', name: 'Computer Science', icon: '💻' },
+    { id: 'physics', name: 'Physics', icon: '⚛️' },
+  ];
+
+  // Sample questions data
+  const questions = [
     {
       id: 1,
-      title: 'How to solve quadratic equations?',
-      content: 'I\'m having trouble understanding the quadratic formula. Can someone explain it step by step?',
-      author: 'John Doe',
-      date: '2024-03-15',
-      tags: ['Mathematics', 'Algebra'],
-      answers: [
-        {
-          id: 1,
-          content: 'The quadratic formula is x = (-b ± √(b²-4ac))/(2a). Let me break it down...',
-          author: 'Jane Smith',
-          date: '2024-03-16',
-          upvotes: 5
-        }
-      ]
+      title: 'How do I solve quadratic equations?',
+      category: 'math',
+      author: 'John D.',
+      votes: 15,
+      answers: 3,
+      timestamp: '2h ago',
+      solved: true
     },
     {
       id: 2,
-      title: 'Best resources for learning React?',
-      content: 'Looking for recommendations on the best tutorials and documentation for learning React.',
-      author: 'Alice Johnson',
-      date: '2024-03-14',
-      tags: ['Programming', 'React'],
-      answers: [
-        {
-          id: 1,
-          content: 'The official React documentation is a great place to start. Also check out freeCodeCamp...',
-          author: 'Bob Wilson',
-          date: '2024-03-15',
-          upvotes: 3
-        }
-      ]
-    }
-  ]);
+      title: 'What is the difference between Java and JavaScript?',
+      category: 'cs',
+      author: 'Sarah M.',
+      votes: 8,
+      answers: 2,
+      timestamp: '4h ago',
+      solved: false
+    },
+    {
+      id: 3,
+      title: 'Can someone explain Newton\'s Third Law?',
+      category: 'physics',
+      author: 'Mike R.',
+      votes: 12,
+      answers: 4,
+      timestamp: '1d ago',
+      solved: true
+    },
+  ];
 
-  const [newQuestion, setNewQuestion] = useState({
-    title: '',
-    content: '',
-    tags: ''
-  });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const question = {
-      id: questions.length + 1,
-      ...newQuestion,
-      author: 'Current User',
-      date: new Date().toISOString().split('T')[0],
-      tags: newQuestion.tags.split(',').map(tag => tag.trim()),
-      answers: []
-    };
-    setQuestions([question, ...questions]);
-    setNewQuestion({ title: '', content: '', tags: '' });
-  };
+  const filteredQuestions = questions.filter(question => 
+    (selectedCategory === 'all' || question.category === selectedCategory) &&
+    (searchQuery === '' || question.title.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Q&A Forum
-          </h1>
-          <p className="text-xl text-gray-600">
-            Ask questions and get help from the community
-          </p>
+    <div className="h-[calc(100vh-5rem)] bg-[#F8FAFC] flex">
+      {/* Categories Sidebar */}
+      <div className="w-64 bg-white border-r border-gray-200 flex flex-col overflow-hidden">
+        <div className="px-4 py-4">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">Categories</h2>
+          <p className="text-sm text-gray-600">Browse questions by subject</p>
         </div>
-
-        <div className="mb-12">
-          <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-8">
-            <div className="space-y-6">
-              <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                  Question Title
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  value={newQuestion.title}
-                  onChange={(e) => setNewQuestion({ ...newQuestion, title: e.target.value })}
-                  className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-3"
-                  placeholder="What would you like to ask?"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
-                  Question Details
-                </label>
-                <textarea
-                  id="content"
-                  value={newQuestion.content}
-                  onChange={(e) => setNewQuestion({ ...newQuestion, content: e.target.value })}
-                  rows={4}
-                  className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-3"
-                  placeholder="Provide more context about your question..."
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-2">
-                  Tags
-                </label>
-                <input
-                  type="text"
-                  id="tags"
-                  value={newQuestion.tags}
-                  onChange={(e) => setNewQuestion({ ...newQuestion, tags: e.target.value })}
-                  className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-3"
-                  placeholder="e.g., Mathematics, Algebra (comma-separated)"
-                />
-              </div>
-              <div>
-                <button
-                  type="submit"
-                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg text-base font-medium text-white bg-[#3B82F6] hover:bg-[#2563EB] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                >
-                  Post Question
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-
-        <div className="space-y-6">
-          {questions.map((question) => (
-            <div key={question.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
-              <div className="p-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold text-gray-900">{question.title}</h2>
-                  <span className="text-sm text-gray-500">{question.date}</span>
-                </div>
-                <p className="text-gray-600 mb-4">{question.content}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">By {question.author}</span>
-                  <div className="flex gap-2">
-                    {question.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gray-50 p-8">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Answers</h3>
-                {question.answers.map((answer) => (
-                  <div key={answer.id} className="mb-6 last:mb-0">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-gray-500">By {answer.author}</span>
-                      <span className="text-sm text-gray-500">{answer.date}</span>
-                    </div>
-                    <p className="text-gray-600 mb-3">{answer.content}</p>
-                    <button className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800">
-                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" />
-                      </svg>
-                      Upvote ({answer.upvotes})
-                    </button>
-                  </div>
-                ))}
-                <div className="mt-6">
-                  <textarea
-                    className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-3"
-                    rows={3}
-                    placeholder="Write your answer..."
-                  />
-                  <button className="mt-3 inline-flex justify-center py-2 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-[#3B82F6] hover:bg-[#2563EB] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-                    Post Answer
-                  </button>
-                </div>
-              </div>
-            </div>
+        <nav className="flex-1 overflow-y-auto px-2 pb-4">
+          {categories.map((category) => (
+            <button
+              key={category.id}
+              onClick={() => setSelectedCategory(category.id)}
+              className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg mb-1 ${
+                selectedCategory === category.id
+                  ? 'bg-blue-50 text-[#3B82F6]'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <span className="text-xl mr-3">{category.icon}</span>
+              {category.name}
+            </button>
           ))}
+        </nav>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="bg-white border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-bold text-gray-900 flex items-center">
+              Q&A Forum
+              <span className="ml-2 text-sm font-normal text-gray-500 flex items-center">
+                <span className="text-lg mr-1">
+                  {categories.find(c => c.id === selectedCategory).icon}
+                </span>
+                {categories.find(c => c.id === selectedCategory).name}
+              </span>
+            </h1>
+            <button className="inline-flex justify-center py-2 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-[#3B82F6] hover:bg-[#2563EB] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+              Ask Question
+            </button>
+          </div>
+          <div className="mt-4">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search questions..."
+              className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2"
+            />
+          </div>
+        </div>
+
+        {/* Questions List */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="divide-y divide-gray-200">
+            {filteredQuestions.map((question) => (
+              <div key={question.id} className="p-6 hover:bg-gray-50 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-lg">
+                        {categories.find(c => c.id === question.category).icon}
+                      </span>
+                      <h3 className="text-lg font-medium text-gray-900">
+                        {question.title}
+                      </h3>
+                      {question.solved && (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          Solved
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-2 flex items-center space-x-4 text-sm text-gray-500">
+                      <span>by {question.author}</span>
+                      <span>•</span>
+                      <span>{question.timestamp}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4 text-sm">
+                    <div className="flex items-center space-x-1 text-gray-500">
+                      <span>👍</span>
+                      <span>{question.votes}</span>
+                    </div>
+                    <div className="flex items-center space-x-1 text-gray-500">
+                      <span>💬</span>
+                      <span>{question.answers}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Panel */}
+      <div className="w-64 bg-white border-l border-gray-200 flex flex-col overflow-hidden">
+        <div className="p-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">Stats</h2>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4">
+          <div className="space-y-4">
+            <div className="bg-blue-50 rounded-lg p-3">
+              <h3 className="text-sm font-medium text-blue-800 mb-2">Your Activity</h3>
+              <div className="space-y-2 text-sm text-blue-600">
+                <div className="flex justify-between">
+                  <span>Questions Asked</span>
+                  <span>5</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Answers Given</span>
+                  <span>12</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Helpful Votes</span>
+                  <span>28</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gray-50 rounded-lg p-3">
+              <h3 className="text-sm font-medium text-gray-800 mb-2">Top Contributors</h3>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                  <span>Sarah M.</span>
+                  <span>152 pts</span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                  <span>John D.</span>
+                  <span>98 pts</span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                  <span>Mike R.</span>
+                  <span>87 pts</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
