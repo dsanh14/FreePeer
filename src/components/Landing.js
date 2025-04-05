@@ -47,13 +47,18 @@ export default function Landing() {
           </div>
           <div 
             ref={svgRef}
-            className="hidden md:block transition-all duration-500 ease-out"
+            className="hidden md:block transition-all duration-500 ease-out relative"
             style={{ opacity: 0, transform: 'translateY(20px)' }}
           >
+            <div className="absolute inset-0 bg-primary-50 rounded-lg"></div>
             <img 
               src="/study-illustration.svg" 
               alt="Students studying together" 
-              className="w-full h-auto"
+              className="w-full h-auto relative z-10"
+              onError={(e) => {
+                console.error('Failed to load illustration:', e);
+                e.target.style.display = 'none';
+              }}
             />
           </div>
         </div>

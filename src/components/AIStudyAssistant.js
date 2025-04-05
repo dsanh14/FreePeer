@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -12,9 +12,8 @@ const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
 export default function AIStudyAssistant() {
   const [messages, setMessages] = useState([
     {
-      id: 1,
-      text: 'Hello! I\'m your AI study assistant powered by Gemini. How can I help you today?',
-      sender: 'assistant'
+      role: 'assistant',
+      content: 'Hello! I\'m your AI study assistant powered by Gemini. How can I help you today?'
     }
   ]);
   const [input, setInput] = useState('');
@@ -31,17 +30,7 @@ export default function AIStudyAssistant() {
     }
   }, [messages, isLoading]);
 
-  // Initialize the chat model on component mount
-  useEffect(() => {
-    try {
-      initializeChat();
-    } catch (err) {
-      console.error('Chat initialization error:', err);
-      setError('Failed to initialize chat. Please refresh the page.');
-    }
-  }, [selectedSubject]); // Reinitialize when subject changes
-
-  const initializeChat = async () => {
+  const initializeChat = useCallback(async () => {
     try {
       const model = genAI.getGenerativeModel({ model: "gemini-pro" });
       const newChat = model.startChat({
@@ -59,8 +48,21 @@ export default function AIStudyAssistant() {
       setChat(newChat);
     } catch (error) {
       console.error('Error initializing chat:', error);
+      setError('Failed to initialize chat. Please refresh the page.');
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    try {
+      initializeChat();
+    } catch (err) {
+      console.error('Chat initialization error:', err);
+      setError('Failed to initialize chat. Please refresh the page.');
+    }
+    return () => {
+      setChat(null);
+    };
+  }, [selectedSubject, initializeChat]);
 
   const subjects = [
     { id: 'general', name: 'General', icon: '📚' },
@@ -227,27 +229,27 @@ export default function AIStudyAssistant() {
           {messages.map((message, index) => (
             <div
               key={`message-${index}`}
-              className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
                 className={`max-w-[80%] rounded-xl px-4 py-2 ${
-                  message.sender === 'user'
+                  message.role === 'user'
                     ? 'bg-[#3B82F6] text-white'
                     : 'bg-gray-50 text-gray-900'
                 }`}
               >
-                {message.sender === 'assistant' ? (
+                {message.role === 'assistant' ? (
                   <div className="prose prose-sm max-w-none">
                     <ReactMarkdown
                       remarkPlugins={[remarkMath]}
                       rehypePlugins={[rehypeKatex]}
                       components={MarkdownComponents}
                     >
-                      {message.text}
+                      {message.content}
                     </ReactMarkdown>
                   </div>
                 ) : (
-                  message.text
+                  message.content
                 )}
               </div>
             </div>

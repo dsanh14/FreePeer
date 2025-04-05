@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -9,6 +9,8 @@ export default function Profile() {
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [showOverlay, setShowOverlay] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     grade: '',
     subjects: [],
@@ -28,42 +30,126 @@ export default function Profile() {
     }
   });
 
-  // Fetch user data from Firestore
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (currentUser) {
-        try {
-          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-          if (userDoc.exists()) {
-            const data = userDoc.data();
-            setUserData(data);
-            setFormData({
-              grade: data.grade || '',
-              subjects: data.subjects || [],
-              learningStyle: data.learningStyle || '',
-              preferredSessionLength: data.preferredSessionLength || '',
-              preferredSessionTime: data.preferredSessionTime || '',
-              additionalInfo: data.additionalInfo || '',
-              goals: data.goals || '',
-              availability: data.availability || {
-                monday: false,
-                tuesday: false,
-                wednesday: false,
-                thursday: false,
-                friday: false,
-                saturday: false,
-                sunday: false
-              }
-            });
+  const fetchUserData = useCallback(async () => {
+    if (!currentUser) return;
+    
+    setIsLoading(true);
+    setError(null);
+    try {
+      const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        setUserData(data);
+        setFormData({
+          grade: data.grade || '',
+          subjects: data.subjects || [],
+          learningStyle: data.learningStyle || '',
+          preferredSessionLength: data.preferredSessionLength || '',
+          preferredSessionTime: data.preferredSessionTime || '',
+          additionalInfo: data.additionalInfo || '',
+          goals: data.goals || '',
+          availability: data.availability || {
+            monday: false,
+            tuesday: false,
+            wednesday: false,
+            thursday: false,
+            friday: false,
+            saturday: false,
+            sunday: false
           }
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-        }
+        });
       }
-    };
-
-    fetchUserData();
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setError('Failed to load profile data. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
   }, [currentUser]);
+
+  useEffect(() => {
+    fetchUserData();
+  }, [fetchUserData]);
+
+  const handleChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }, []);
+
+  const handleSubjectToggle = useCallback((subject) => {
+    setFormData(prev => ({
+      ...prev,
+      subjects: prev.subjects.includes(subject)
+        ? prev.subjects.filter(s => s !== subject)
+        : [...prev.subjects, subject]
+    }));
+  }, []);
+
+  const handleAvailabilityChange = useCallback((day) => {
+    setFormData(prev => ({
+      ...prev,
+      availability: {
+        ...prev.availability,
+        [day]: !prev.availability[day]
+      }
+    }));
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!currentUser) return;
+
+    setIsLoading(true);
+    setError(null);
+    try {
+      const userRef = doc(db, 'users', currentUser.uid);
+      await updateDoc(userRef, {
+        ...formData,
+        lastUpdated: new Date(),
+        onboardingCompleted: true
+      });
+      
+      await fetchUserData();
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setError('Failed to update preferences. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleQuestionClick = useCallback((activity) => {
+    setSelectedQuestion(activity);
+    setShowOverlay(true);
+  }, []);
+
+  if (isLoading && !userData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !userData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded relative" role="alert">
+            <span className="block sm:inline">{error}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Sample user stats - in a real app, these would come from a database
   const userStats = {
@@ -131,69 +217,6 @@ export default function Profile() {
     'Art',
     'Music'
   ];
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubjectToggle = (subject) => {
-    setFormData(prev => ({
-      ...prev,
-      subjects: prev.subjects.includes(subject)
-        ? prev.subjects.filter(s => s !== subject)
-        : [...prev.subjects, subject]
-    }));
-  };
-
-  const handleAvailabilityChange = (day) => {
-    setFormData(prev => ({
-      ...prev,
-      availability: {
-        ...prev.availability,
-        [day]: !prev.availability[day]
-      }
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const userRef = doc(db, 'users', currentUser.uid);
-      await updateDoc(userRef, {
-        ...formData,
-        lastUpdated: new Date(),
-        onboardingCompleted: true
-      });
-      
-      // Fetch updated data
-      const updatedDoc = await getDoc(userRef);
-      if (updatedDoc.exists()) {
-        const updatedData = updatedDoc.data();
-        setUserData(updatedData);
-        setFormData(prev => ({
-          ...prev,
-          lastUpdated: new Date()
-        }));
-      }
-      
-      setIsEditing(false);
-      
-      // Show success message
-      alert('Preferences updated successfully!');
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      alert('Failed to update preferences. Please try again.');
-    }
-  };
-
-  const handleQuestionClick = (activity) => {
-    setSelectedQuestion(activity);
-    setShowOverlay(true);
-  };
 
   const xpPercentage = (userStats.xp / userStats.nextLevelXp) * 100;
 
