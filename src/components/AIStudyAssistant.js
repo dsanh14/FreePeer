@@ -9,7 +9,8 @@ import 'katex/dist/katex.min.css';
 
 // Initialize Gemini API with your API key directly
 // In a production environment, you should handle this more securely
-const API_KEY = "YOUR_GEMINI_API_KEY"; // Replace with your actual API key
+//const API_KEY = "AIzaSyC-r-k3uCfZ367p-FElkHuv6NDUnLSThms"; // Replace with your actual API key
+const API_KEY = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 export default function AIStudyAssistant() {
