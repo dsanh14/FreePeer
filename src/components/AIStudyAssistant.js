@@ -23,7 +23,7 @@ export default function AIStudyAssistant() {
   // Initialize the model on component mount
   useEffect(() => {
     try {
-      const geminiModel = genAI.getGenerativeModel({ model: "gemini-pro" });
+      const geminiModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
       setModel(geminiModel);
       setError(null);
     } catch (err) {
