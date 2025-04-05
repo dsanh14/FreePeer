@@ -64,6 +64,69 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Become a Tutor Section */}
+      <section className="bg-primary-50 py-16">
+        <div className="container mx-auto px-6">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Become a Tutor</h2>
+            <p className="text-lg text-gray-600 mb-8">
+              Share your knowledge and help other students succeed. Join our community of peer tutors and make a difference in students' lives.
+            </p>
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Why Tutor with Us?</h3>
+                <ul className="space-y-3 text-left">
+                  <li className="flex items-start">
+                    <span className="text-primary-600 mr-2">✓</span>
+                    <span>Flexible scheduling</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-primary-600 mr-2">✓</span>
+                    <span>Build your teaching experience</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-primary-600 mr-2">✓</span>
+                    <span>Help students in need</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-primary-600 mr-2">✓</span>
+                    <span>Join a supportive community</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Requirements</h3>
+                <ul className="space-y-3 text-left">
+                  <li className="flex items-start">
+                    <span className="text-primary-600 mr-2">✓</span>
+                    <span>Strong academic background</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-primary-600 mr-2">✓</span>
+                    <span>Excellent communication skills</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-primary-600 mr-2">✓</span>
+                    <span>Passion for teaching</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-primary-600 mr-2">✓</span>
+                    <span>Reliable internet connection</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <Link 
+              to="/tutor-application" 
+              className="inline-block px-8 py-3 bg-primary-600 text-white font-semibold rounded-lg 
+                         hover:bg-primary-500 transition-colors"
+            >
+              Apply to Become a Tutor
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="bg-primary-600 text-white py-16">
         <div className="container mx-auto px-6 text-center">

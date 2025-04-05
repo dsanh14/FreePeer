@@ -72,7 +72,7 @@ export default function FindTutors() {
 
       return true;
     });
-  }, [selectedSubject, availability]);
+  }, [selectedSubject, availability, tutors, subjects, availabilityOptions]);
 
   // Calculate stats for filtered results
   const stats = useMemo(() => {
@@ -118,7 +118,7 @@ export default function FindTutors() {
               id="subject"
               value={selectedSubject}
               onChange={(e) => setSelectedSubject(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 hover:border-primary-400 transition-colors duration-200"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 hover:border-primary-500 transition-colors duration-200"
             >
               {subjects.map((subject) => (
                 <option key={subject.id} value={subject.id}>
@@ -137,7 +137,7 @@ export default function FindTutors() {
               id="availability"
               value={availability}
               onChange={(e) => setAvailability(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 hover:border-primary-400 transition-colors duration-200"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 hover:border-primary-500 transition-colors duration-200"
             >
               {availabilityOptions.map((option) => (
                 <option key={option.id} value={option.id}>
@@ -171,7 +171,7 @@ export default function FindTutors() {
                   <img
                     src={tutor.image}
                     alt={tutor.name}
-                    className="h-12 w-12 rounded-full ring-2 ring-transparent hover:ring-primary-400 transition-all duration-200"
+                    className="h-12 w-12 rounded-full ring-2 ring-transparent hover:ring-primary-500 transition-all duration-200"
                   />
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 hover:text-primary-600 transition-colors duration-200">
@@ -206,7 +206,7 @@ export default function FindTutors() {
                     {tutor.availability}
                   </div>
                 </div>
-                <button className="mt-4 w-full bg-primary-600 text-white px-4 py-2 rounded-md font-medium hover:bg-primary-500 transform hover:translate-y-[-1px] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                <button className="mt-4 w-full bg-primary-600 text-white px-4 py-2 rounded-md font-medium hover:bg-primary-500 transform hover:translate-y-[-1px] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600">
                   Schedule Session
                 </button>
               </div>
