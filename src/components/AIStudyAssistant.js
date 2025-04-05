@@ -3,13 +3,27 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Initialize Gemini API with error handling
 const initializeAI = () => {
-  const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-  if (!apiKey) {
-    console.error('Gemini API key is missing');
-    return null;
-  }
   try {
-    return new GoogleGenerativeAI(apiKey);
+    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    console.log('API Key available:', !!apiKey); // Debug log
+    
+    if (!apiKey) {
+      throw new Error('Gemini API key is missing');
+    }
+
+    // Verify API key format (should be a non-empty string)
+    if (typeof apiKey !== 'string' || apiKey.trim() === '') {
+      throw new Error('Invalid API key format');
+    }
+
+    const ai = new GoogleGenerativeAI(apiKey);
+    
+    // Test the API instance
+    if (!ai || typeof ai.getGenerativeModel !== 'function') {
+      throw new Error('Invalid AI instance created');
+    }
+
+    return ai;
   } catch (error) {
     console.error('Error initializing Gemini API:', error);
     return null;
@@ -32,13 +46,26 @@ export default function AIStudyAssistant() {
 
   // Initialize AI on component mount
   useEffect(() => {
-    const ai = initializeAI();
-    if (ai) {
-      setGenAI(ai);
-      setError(null);
-    } else {
-      setError('AI service initialization failed. Please check your API key configuration.');
-    }
+    const initAI = async () => {
+      try {
+        const ai = initializeAI();
+        if (!ai) {
+          throw new Error('Failed to initialize AI service');
+        }
+
+        // Test the API with a simple request
+        const model = ai.getGenerativeModel({ model: "gemini-pro" });
+        await model.generateContent("Test connection");
+
+        setGenAI(ai);
+        setError(null);
+      } catch (err) {
+        console.error('AI initialization error:', err);
+        setError(`AI service initialization failed: ${err.message}`);
+      }
+    };
+
+    initAI();
   }, []);
 
   const subjects = [
