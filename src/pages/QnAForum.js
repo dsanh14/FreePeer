@@ -48,6 +48,7 @@ const mockQuestions = [
 function QnAForum() {
   const [questions, setQuestions] = useState(mockQuestions);
   const [newQuestion, setNewQuestion] = useState({ title: '', content: '' });
+  const answerBgColor = useColorModeValue('gray.50', 'gray.700');
 
   const handleSubmitQuestion = () => {
     if (!newQuestion.title.trim() || !newQuestion.content.trim()) return;
@@ -124,7 +125,7 @@ function QnAForum() {
                   <Box
                     key={answer.id}
                     p={4}
-                    bg={useColorModeValue('gray.50', 'gray.700')}
+                    bg={answerBgColor}
                     borderRadius="md"
                     mt={2}
                   >
