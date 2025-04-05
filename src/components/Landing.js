@@ -1,7 +1,32 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Landing() {
+  const svgRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const svg = svgRef.current;
+      if (!svg) return;
+
+      const rect = svg.getBoundingClientRect();
+      const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+      
+      if (isVisible) {
+        svg.style.opacity = '1';
+        svg.style.transform = 'translateY(0)';
+      } else {
+        svg.style.opacity = '0';
+        svg.style.transform = 'translateY(20px)';
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial check
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white">
       {/* Hero Section */}
@@ -20,7 +45,11 @@ export default function Landing() {
               <Link to="/about" className="btn-outline">Learn More</Link>
             </div>
           </div>
-          <div className="hidden md:block">
+          <div 
+            ref={svgRef}
+            className="hidden md:block transition-all duration-500 ease-out"
+            style={{ opacity: 0, transform: 'translateY(20px)' }}
+          >
             <img 
               src="/study-illustration.svg" 
               alt="Students studying together" 
