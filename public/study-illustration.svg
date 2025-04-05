@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#F0F7FF"/>
+  
+  <!-- Students -->
+  <g transform="translate(200, 200)">
+    <!-- Student 1 -->
+    <circle cx="100" cy="100" r="40" fill="#0EA5E9"/>
+    <rect x="80" y="140" width="40" height="80" fill="#0EA5E9"/>
+    
+    <!-- Student 2 -->
+    <circle cx="300" cy="100" r="40" fill="#0284C7"/>
+    <rect x="280" y="140" width="40" height="80" fill="#0284C7"/>
+    
+    <!-- Book -->
+    <rect x="150" y="180" width="100" height="20" fill="#0369A1"/>
+    <rect x="150" y="200" width="100" height="20" fill="#075985"/>
+    
+    <!-- Laptop -->
+    <rect x="250" y="180" width="80" height="60" fill="#0C4A6E"/>
+    <rect x="250" y="240" width="100" height="10" fill="#0C4A6E"/>
+  </g>
+  
+  <!-- Thought bubbles -->
+  <g transform="translate(150, 100)">
+    <circle cx="0" cy="0" r="30" fill="white" stroke="#0EA5E9" stroke-width="2"/>
+    <text x="0" y="5" text-anchor="middle" font-family="Arial" font-size="20" fill="#0C4A6E">?</text>
+  </g>
+  
+  <g transform="translate(350, 100)">
+    <circle cx="0" cy="0" r="30" fill="white" stroke="#0284C7" stroke-width="2"/>
+    <text x="0" y="5" text-anchor="middle" font-family="Arial" font-size="20" fill="#0C4A6E">!</text>
+  </g>
+</svg> 
