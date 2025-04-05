@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 
 export default function FindTutors() {
   const [selectedSubject, setSelectedSubject] = useState('all');
-  const [priceRange, setPriceRange] = useState('all');
   const [availability, setAvailability] = useState('all');
 
   // Sample tutor data (replace with actual data from backend)
@@ -13,7 +12,6 @@ export default function FindTutors() {
       subjects: ['Mathematics', 'Physics'],
       rating: 4.8,
       reviews: 24,
-      price: 25,
       availability: 'Weekdays',
       image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
     },
@@ -23,7 +21,6 @@ export default function FindTutors() {
       subjects: ['Computer Science', 'Mathematics'],
       rating: 4.9,
       reviews: 36,
-      price: 30,
       availability: 'Weekends',
       image: 'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
     },
@@ -33,7 +30,6 @@ export default function FindTutors() {
       subjects: ['English', 'History'],
       rating: 4.7,
       reviews: 18,
-      price: 20,
       availability: 'Flexible',
       image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
     },
@@ -46,13 +42,6 @@ export default function FindTutors() {
     { id: 'cs', name: 'Computer Science', icon: '💻' },
     { id: 'english', name: 'English', icon: '📝' },
     { id: 'history', name: 'History', icon: '🏛️' },
-  ];
-
-  const priceRanges = [
-    { id: 'all', name: 'All Prices', icon: '💰' },
-    { id: 'under20', name: 'Under $20/hr', icon: '$', max: 20 },
-    { id: '20-30', name: '$20-30/hr', icon: '$$', min: 20, max: 30 },
-    { id: 'over30', name: 'Over $30/hr', icon: '$$$', min: 30 },
   ];
 
   const availabilityOptions = [
@@ -73,19 +62,6 @@ export default function FindTutors() {
         }
       }
 
-      // Price range filter
-      if (priceRange !== 'all') {
-        const selectedRange = priceRanges.find(r => r.id === priceRange);
-        if (selectedRange) {
-          if (selectedRange.min && tutor.price < selectedRange.min) {
-            return false;
-          }
-          if (selectedRange.max && tutor.price > selectedRange.max) {
-            return false;
-          }
-        }
-      }
-
       // Availability filter
       if (availability !== 'all') {
         const availabilityName = availabilityOptions.find(a => a.id === availability)?.name;
@@ -96,29 +72,26 @@ export default function FindTutors() {
 
       return true;
     });
-  }, [selectedSubject, priceRange, availability]);
+  }, [selectedSubject, availability]);
 
   // Calculate stats for filtered results
   const stats = useMemo(() => {
     if (filteredTutors.length === 0) {
       return {
         count: 0,
-        avgPrice: 0,
         avgRating: 0,
       };
     }
 
     const total = filteredTutors.reduce(
       (acc, tutor) => ({
-        price: acc.price + tutor.price,
         rating: acc.rating + tutor.rating,
       }),
-      { price: 0, rating: 0 }
+      { rating: 0 }
     );
 
     return {
       count: filteredTutors.length,
-      avgPrice: Math.round(total.price / filteredTutors.length),
       avgRating: (total.rating / filteredTutors.length).toFixed(1),
     };
   }, [filteredTutors]);
@@ -135,7 +108,7 @@ export default function FindTutors() {
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Subject Filter */}
           <div>
             <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
@@ -150,25 +123,6 @@ export default function FindTutors() {
               {subjects.map((subject) => (
                 <option key={subject.id} value={subject.id}>
                   {subject.icon} {subject.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Price Range Filter */}
-          <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-              Price Range
-            </label>
-            <select
-              id="price"
-              value={priceRange}
-              onChange={(e) => setPriceRange(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 hover:border-primary-400 transition-colors duration-200"
-            >
-              {priceRanges.map((range) => (
-                <option key={range.id} value={range.id}>
-                  {range.icon} {range.name}
                 </option>
               ))}
             </select>
@@ -200,7 +154,6 @@ export default function FindTutors() {
             <span>{stats.count} tutors found</span>
             {stats.count > 0 && (
               <div className="flex space-x-4">
-                <span>Average Price: ${stats.avgPrice}/hr</span>
                 <span>Average Rating: ⭐ {stats.avgRating}</span>
               </div>
             )}
@@ -247,22 +200,14 @@ export default function FindTutors() {
                     ))}
                   </div>
                 </div>
-                <div className="mt-4 flex items-center justify-between">
-                  <div>
-                    <div className="text-sm text-gray-500">Price</div>
-                    <div className="text-lg font-semibold text-gray-900 hover:text-primary-600 transition-colors duration-200">
-                      ${tutor.price}/hr
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-500">Availability</div>
-                    <div className="text-sm font-medium text-gray-900 hover:text-primary-600 transition-colors duration-200">
-                      {tutor.availability}
-                    </div>
+                <div className="mt-4">
+                  <div className="text-sm text-gray-500">Availability</div>
+                  <div className="text-sm font-medium text-gray-900 hover:text-primary-600 transition-colors duration-200">
+                    {tutor.availability}
                   </div>
                 </div>
                 <button className="mt-4 w-full bg-primary-600 text-white px-4 py-2 rounded-md font-medium hover:bg-primary-500 transform hover:translate-y-[-1px] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                  Book Session
+                  Schedule Session
                 </button>
               </div>
             </div>
@@ -273,7 +218,6 @@ export default function FindTutors() {
             <button
               onClick={() => {
                 setSelectedSubject('all');
-                setPriceRange('all');
                 setAvailability('all');
               }}
               className="mt-4 text-primary-600 hover:text-primary-500 font-medium"

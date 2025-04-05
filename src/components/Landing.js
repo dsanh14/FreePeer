@@ -4,17 +4,6 @@ import { Link } from 'react-router-dom';
 export default function Landing() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white">
-      {/* Navigation */}
-      <nav className="px-6 py-4 bg-white shadow-sm">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="text-2xl font-bold text-primary-600">StudyBuddy Connect</div>
-          <div className="space-x-4">
-            <Link to="/login" className="btn-outline">Log In</Link>
-            <Link to="/signup" className="btn-primary">Sign Up</Link>
-          </div>
-        </div>
-      </nav>
-
       {/* Hero Section */}
       <section className="container mx-auto px-6 py-16 md:py-24">
         <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -91,46 +80,6 @@ export default function Landing() {
           </Link>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">StudyBuddy Connect</h3>
-              <p className="text-gray-400">
-                Making quality education accessible to everyone.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link to="/about" className="hover:text-white">About Us</Link></li>
-                <li><Link to="/features" className="hover:text-white">Features</Link></li>
-                <li><Link to="/pricing" className="hover:text-white">Pricing</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link to="/help" className="hover:text-white">Help Center</Link></li>
-                <li><Link to="/contact" className="hover:text-white">Contact Us</Link></li>
-                <li><Link to="/faq" className="hover:text-white">FAQ</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link to="/privacy" className="hover:text-white">Privacy Policy</Link></li>
-                <li><Link to="/terms" className="hover:text-white">Terms of Service</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; {new Date().getFullYear()} StudyBuddy Connect. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 } 
