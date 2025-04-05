@@ -38,7 +38,7 @@ function Signup() {
     try {
       setLoading(true);
       await signup(email, password);
-      navigate('/');
+      navigate('/home');
     } catch (error) {
       toast({
         title: 'Error',

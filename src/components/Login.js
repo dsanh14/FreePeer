@@ -27,7 +27,7 @@ function Login() {
     try {
       setLoading(true);
       await login(email, password);
-      navigate('/');
+      navigate('/home');
     } catch (error) {
       toast({
         title: 'Error',
