@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -26,6 +26,12 @@ export default function AIStudyAssistant() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [chatHistory, setChatHistory] = useState([]);
+  const messagesEndRef = useRef(null);
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   // Initialize the chat model on component mount
   useEffect(() => {
@@ -72,12 +78,16 @@ export default function AIStudyAssistant() {
 
       Remember to be educational, clear, and engaging in your responses.`;
 
-      // Initialize with system prompt
       await chat.sendMessage(systemPrompt);
       setChatHistory([{ role: 'system', parts: systemPrompt }]);
       return chat;
     } catch (error) {
       console.error('Error initializing chat:', error);
+      if (error.message.includes('quota')) {
+        setError('API quota exceeded. Please try again in a minute.');
+      } else {
+        setError('Failed to initialize chat. Please refresh the page.');
+      }
       throw error;
     }
   };
@@ -106,15 +116,13 @@ export default function AIStudyAssistant() {
     setIsLoading(true);
 
     try {
-      // Initialize new chat with history if needed
       const chat = await initializeChat();
       
       // Add previous context
-      for (const msg of chatHistory.slice(1)) { // Skip system prompt
+      for (const msg of chatHistory.slice(1)) {
         await chat.sendMessage(msg.parts);
       }
 
-      // Send current message
       const result = await chat.sendMessage(input);
       const response = await result.response;
       const text = response.text();
@@ -123,7 +131,6 @@ export default function AIStudyAssistant() {
         throw new Error('Empty response from AI');
       }
 
-      // Update chat history
       setChatHistory(prev => [
         ...prev,
         { role: 'user', parts: input },
@@ -137,7 +144,11 @@ export default function AIStudyAssistant() {
       }]);
     } catch (error) {
       console.error('Error generating response:', error);
-      setError(error.message || 'An error occurred while generating the response');
+      if (error.message.includes('quota')) {
+        setError('API quota exceeded. Please try again in a minute.');
+      } else {
+        setError('An error occurred while generating the response. Please try again.');
+      }
       setMessages(prev => [...prev, {
         id: prev.length + 1,
         text: 'I apologize, but I encountered an error. Please try again.',
@@ -310,6 +321,7 @@ export default function AIStudyAssistant() {
               </div>
             </div>
           )}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Input Area */}
@@ -321,13 +333,13 @@ export default function AIStudyAssistant() {
               onChange={(e) => setInput(e.target.value)}
               placeholder={`Ask a question about ${subjects.find(s => s.id === selectedSubject).name.toLowerCase()}...`}
               className="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2"
-              disabled={isLoading || !!error}
+              disabled={isLoading}
             />
             <button
               type="submit"
-              disabled={isLoading || !!error}
+              disabled={isLoading}
               className={`inline-flex justify-center py-2 px-4 border border-transparent rounded-lg text-sm font-medium text-white ${
-                isLoading || !!error
+                isLoading
                   ? 'bg-blue-400 cursor-not-allowed'
                   : 'bg-[#3B82F6] hover:bg-[#2563EB] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
               } transition-colors`}
