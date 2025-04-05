@@ -6,6 +6,8 @@ import Landing from './components/Landing';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Home from './components/Home';
+import AIHelp from './components/AIHelp';
+import FindTutors from './components/FindTutors';
 import PrivateRoute from './components/PrivateRoute';
 import AIChat from './pages/AIChat';
 import TutorMatch from './pages/TutorMatch';
@@ -26,6 +28,22 @@ function App() {
               element={
                 <PrivateRoute>
                   <Home />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/ai-help"
+              element={
+                <PrivateRoute>
+                  <AIHelp />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/tutoring"
+              element={
+                <PrivateRoute>
+                  <FindTutors />
                 </PrivateRoute>
               }
             />
