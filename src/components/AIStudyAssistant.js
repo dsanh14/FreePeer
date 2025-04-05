@@ -25,19 +25,62 @@ export default function AIStudyAssistant() {
   const [selectedSubject, setSelectedSubject] = useState('general');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [model, setModel] = useState(null);
+  const [chatHistory, setChatHistory] = useState([]);
 
-  // Initialize the model on component mount
+  // Initialize the chat model on component mount
   useEffect(() => {
     try {
-      const geminiModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-      setModel(geminiModel);
-      setError(null);
+      initializeChat();
     } catch (err) {
-      console.error('Model initialization error:', err);
-      setError('Failed to initialize AI model. Please check your configuration.');
+      console.error('Chat initialization error:', err);
+      setError('Failed to initialize chat. Please refresh the page.');
     }
-  }, []);
+  }, [selectedSubject]); // Reinitialize when subject changes
+
+  const initializeChat = async () => {
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      const chat = model.startChat({
+        history: [],
+        generationConfig: {
+          maxOutputTokens: 2048,
+          temperature: 0.7,
+          topP: 0.8,
+          topK: 40,
+        },
+      });
+
+      const systemPrompt = `You are a knowledgeable and helpful study assistant specializing in ${
+        subjects.find(s => s.id === selectedSubject).name
+      }. 
+
+      Guidelines for your responses:
+      1. Maintain context of the conversation and refer back to previous questions when relevant
+      2. Use rich formatting in your responses:
+         - **Bold** for important terms and key concepts
+         - *Italics* for emphasis
+         - \`code blocks\` for formulas, equations, or code
+         - Bullet points for lists
+         - Numbered lists for steps or sequences
+         - Tables for comparing items
+         - > Blockquotes for important notes
+         - Mathematical notation when appropriate (e.g., $E = mc^2$)
+      3. Break down complex topics into digestible parts
+      4. Provide examples and real-world applications
+      5. If unsure, ask clarifying questions
+      6. Stay focused on the current subject but acknowledge connections to other fields
+
+      Remember to be educational, clear, and engaging in your responses.`;
+
+      // Initialize with system prompt
+      await chat.sendMessage(systemPrompt);
+      setChatHistory([{ role: 'system', parts: systemPrompt }]);
+      return chat;
+    } catch (error) {
+      console.error('Error initializing chat:', error);
+      throw error;
+    }
+  };
 
   const subjects = [
     { id: 'general', name: 'General', icon: '📚' },
@@ -52,55 +95,40 @@ export default function AIStudyAssistant() {
     { id: 'languages', name: 'Languages', icon: '🌎' }
   ];
 
-  const generatePrompt = (userInput, subject) => {
-    const currentSubject = subjects.find(s => s.id === subject).name;
-    return `You are a helpful and knowledgeable study assistant specializing in ${currentSubject}. 
-    Please provide clear, educational responses using rich formatting:
-
-    - Use **bold** for important terms
-    - Use *italics* for emphasis
-    - Use \`code blocks\` for formulas, equations, or code snippets
-    - Use bullet points or numbered lists for steps or multiple points
-    - Use mathematical notation when appropriate (e.g., \$E = mc^2\$)
-    - Include examples with proper formatting
-    - Use tables when comparing multiple items
-    - Use > for important notes or quotes
-
-    If providing code examples, use proper syntax highlighting by specifying the language:
-    \`\`\`python
-    # Example code
-    \`\`\`
-
-    Question: ${userInput}`;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
     
-    // Clear any previous errors
     setError(null);
-
-    // Check if model is properly initialized
-    if (!model) {
-      setError('AI model is not properly initialized. Please refresh the page.');
-      return;
-    }
-
     const userMessage = { id: messages.length + 1, text: input, sender: 'user' };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
 
     try {
-      const prompt = generatePrompt(input, selectedSubject);
-      const result = await model.generateContent(prompt);
+      // Initialize new chat with history if needed
+      const chat = await initializeChat();
+      
+      // Add previous context
+      for (const msg of chatHistory.slice(1)) { // Skip system prompt
+        await chat.sendMessage(msg.parts);
+      }
+
+      // Send current message
+      const result = await chat.sendMessage(input);
       const response = await result.response;
       const text = response.text();
 
       if (!text) {
         throw new Error('Empty response from AI');
       }
+
+      // Update chat history
+      setChatHistory(prev => [
+        ...prev,
+        { role: 'user', parts: input },
+        { role: 'model', parts: text }
+      ]);
 
       setMessages(prev => [...prev, {
         id: prev.length + 1,
