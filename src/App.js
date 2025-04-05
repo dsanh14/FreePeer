@@ -13,6 +13,9 @@ import TutorLogin from './components/TutorLogin';
 import TutorDashboard from './components/TutorDashboard';
 import TutorApplication from './components/TutorApplication';
 import Unauthorized from './components/Unauthorized';
+import StudyResources from './components/StudyResources';
+import QAForum from './components/QAForum';
+import AIStudyAssistant from './components/AIStudyAssistant';
 
 function App() {
   return (
@@ -54,6 +57,36 @@ function App() {
               <PrivateRoute roles={['student']}>
                 <Layout>
                   <FindTutors />
+                </Layout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/study-resources"
+            element={
+              <PrivateRoute roles={['student']}>
+                <Layout>
+                  <StudyResources />
+                </Layout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/qa-forum"
+            element={
+              <PrivateRoute roles={['student']}>
+                <Layout>
+                  <QAForum />
+                </Layout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/ai-study-assistant"
+            element={
+              <PrivateRoute roles={['student']}>
+                <Layout>
+                  <AIStudyAssistant />
                 </Layout>
               </PrivateRoute>
             }

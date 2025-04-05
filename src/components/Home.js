@@ -10,25 +10,25 @@ export default function Home() {
       title: 'AI Study Assistant',
       description: 'Get instant help with homework and study materials',
       icon: '🤖',
-      link: '/ai-help'
+      link: '/ai-study-assistant'
     },
     {
       title: 'Find Tutors',
       description: 'Connect with experienced peer tutors',
       icon: '👥',
-      link: '/tutoring'
+      link: '/find-tutors'
     },
     {
       title: 'Study Resources',
       description: 'Access a library of study materials',
       icon: '📚',
-      link: '/resources'
+      link: '/study-resources'
     },
     {
       title: 'Q&A Forum',
       description: 'Ask questions and help others',
       icon: '💭',
-      link: '/forum'
+      link: '/qa-forum'
     }
   ];
 
@@ -99,8 +99,8 @@ export default function Home() {
             <p className="text-sm text-gray-600">This week</p>
           </div>
           <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="text-lg font-medium text-gray-900">Tutoring Sessions</h3>
-            <p className="text-3xl font-bold text-primary-600">3</p>
+            <h3 className="text-lg font-medium text-gray-900">Resources Used</h3>
+            <p className="text-3xl font-bold text-primary-600">15</p>
             <p className="text-sm text-gray-600">This week</p>
           </div>
         </div>
