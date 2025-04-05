@@ -11,6 +11,7 @@ import 'katex/dist/katex.min.css';
 // In a production environment, you should handle this more securely
 //const API_KEY = "AIzaSyC-r-k3uCfZ367p-FElkHuv6NDUnLSThms"; // Replace with your actual API key
 const API_KEY = process.env.GEMINI_API_KEY;
+console.log(API_KEY);
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 export default function AIStudyAssistant() {
