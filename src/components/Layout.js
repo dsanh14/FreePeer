@@ -28,11 +28,11 @@ export default function Layout({ children }) {
           <div className="flex justify-between h-16">
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
-                <Link to="/" className="text-2xl font-bold text-[#3B82F6]">
-                  FreePeer
+                <Link to="/" className="text-2xl font-bold text-primary-600">
+                  StudyBuddy Connect
                 </Link>
               </div>
-              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+              <div className="hidden sm:ml-12 sm:flex sm:space-x-8">
                 <NavLink
                   to="/home"
                   className={({ isActive }) =>
@@ -114,7 +114,7 @@ export default function Layout({ children }) {
                     onClick={() => setShowProfileMenu(!showProfileMenu)}
                     className="flex items-center space-x-2 focus:outline-none"
                   >
-                    <div className="w-8 h-8 rounded-full bg-[#3B82F6] text-white flex items-center justify-center text-sm font-medium">
+                    <div className="w-10 h-10 rounded-full bg-[#3B82F6] text-white flex items-center justify-center text-base font-medium">
                       {currentUser.displayName?.[0] || '?'}
                     </div>
                   </button>
@@ -169,7 +169,7 @@ export default function Layout({ children }) {
         <div className="max-w-[95%] xl:max-w-[90%] 2xl:max-w-[85%] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4">FreePeer</h3>
+              <h3 className="text-lg font-semibold mb-4">StudyBuddy Connect</h3>
               <p className="text-gray-400">Making quality education accessible to everyone.</p>
             </div>
             <div>

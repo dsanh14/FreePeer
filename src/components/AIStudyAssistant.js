@@ -21,14 +21,15 @@ export default function AIStudyAssistant() {
   const [selectedSubject, setSelectedSubject] = useState('general');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [chatHistory, setChatHistory] = useState([]);
   const [chat, setChat] = useState(null);
   const messagesEndRef = useRef(null);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+  }, [messages, isLoading]);
 
   // Initialize the chat model on component mount
   useEffect(() => {
@@ -176,9 +177,9 @@ export default function AIStudyAssistant() {
   };
 
   return (
-    <div className="h-[calc(100vh-5rem)] bg-[#F8FAFC] flex">
+    <div className="h-[calc(100vh-8rem)] bg-[#F8FAFC] flex">
       {/* Subject Sidebar */}
-      <div className="w-64 bg-white border-r border-gray-200 flex flex-col overflow-hidden">
+      <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
         <div className="px-4 py-4">
           <h2 className="text-lg font-semibold text-gray-900 mb-2">Subjects</h2>
           <p className="text-sm text-gray-600">Select a subject to get specialized help</p>
@@ -202,11 +203,11 @@ export default function AIStudyAssistant() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-6 py-4">
           <h1 className="text-xl font-bold text-gray-900 flex items-center">
-            AI Study Assistant
+            StudyBuddy Connect AI Assistant
             <span className="ml-2 text-sm font-normal text-gray-500 flex items-center">
               <span className="text-lg mr-1">
                 {subjects.find(s => s.id === selectedSubject).icon}
@@ -222,10 +223,10 @@ export default function AIStudyAssistant() {
         </div>
 
         {/* Chat Area with rich text support */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
-          {messages.map((message) => (
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4" style={{ maxHeight: 'calc(100vh - 15rem)' }}>
+          {messages.map((message, index) => (
             <div
-              key={message.id}
+              key={`message-${index}`}
               className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
@@ -262,7 +263,7 @@ export default function AIStudyAssistant() {
               </div>
             </div>
           )}
-          <div ref={messagesEndRef} />
+          <div ref={messagesEndRef} style={{ height: '1px' }} />
         </div>
 
         {/* Input Area */}
@@ -292,7 +293,7 @@ export default function AIStudyAssistant() {
       </div>
 
       {/* Tips Panel */}
-      <div className="w-64 bg-white border-l border-gray-200 flex flex-col overflow-hidden">
+      <div className="w-64 bg-white border-l border-gray-200 flex flex-col">
         <div className="p-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">Tips</h2>
         </div>

@@ -255,46 +255,44 @@ export default function Onboarding() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow-sm p-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to FreePeer!</h1>
-            <p className="text-gray-600">Let's get to know you better to find the perfect tutor match.</p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {renderStep()}
-
-            <div className="flex justify-between pt-6">
-              {step > 1 && (
-                <button
-                  type="button"
-                  onClick={() => setStep(step - 1)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Previous
-                </button>
-              )}
-              
-              {step < 3 ? (
-                <button
-                  type="button"
-                  onClick={() => setStep(step + 1)}
-                  className="ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
-                >
-                  Next
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  className="ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
-                >
-                  Complete Setup
-                </button>
-              )}
-            </div>
-          </form>
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to StudyBuddy Connect!</h1>
+          <p className="text-gray-600">Let's set up your profile to help you find the perfect study partners.</p>
         </div>
+
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {renderStep()}
+
+          <div className="flex justify-between pt-6">
+            {step > 1 && (
+              <button
+                type="button"
+                onClick={() => setStep(step - 1)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Previous
+              </button>
+            )}
+            
+            {step < 3 ? (
+              <button
+                type="button"
+                onClick={() => setStep(step + 1)}
+                className="ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
+              >
+                Next
+              </button>
+            ) : (
+              <button
+                type="submit"
+                className="ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
+              >
+                Complete Setup
+              </button>
+            )}
+          </div>
+        </form>
       </div>
     </div>
   );
