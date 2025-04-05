@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Landing() {
   const svgRef = useRef(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,6 +16,16 @@ export default function Landing() {
       if (isVisible) {
         svg.style.opacity = '1';
         svg.style.transform = 'translateY(0)';
+        
+        // Calculate scroll progress
+        const progress = Math.min(1, Math.max(0, (window.innerHeight - rect.top) / rect.height));
+        setScrollProgress(progress);
+        
+        // Update progress bar width
+        const progressBar = svg.querySelector('.progress-bar');
+        if (progressBar) {
+          progressBar.style.width = `${progress * 300}px`;
+        }
       } else {
         svg.style.opacity = '0';
         svg.style.transform = 'translateY(20px)';

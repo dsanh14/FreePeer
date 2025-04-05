@@ -3,14 +3,22 @@
   <style>
     @keyframes float {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+      50% { transform: translateY(-15px); }
     }
     @keyframes pulse {
       0%, 100% { opacity: 0.2; }
       50% { opacity: 0.4; }
     }
+    @keyframes progress {
+      from { width: 0; }
+      to { width: 300; }
+    }
     .floating { animation: float 3s ease-in-out infinite; }
     .pulsing { animation: pulse 3s ease-in-out infinite; }
+    .progress-bar { 
+      animation: progress 2s ease-out forwards;
+      transform-origin: left;
+    }
   </style>
   
   <!-- Background -->
@@ -28,15 +36,15 @@
     
     <!-- Chat Bubbles -->
     <g transform="translate(450, 150)" class="floating">
-      <path d="M0 0 L30 30 L0 60 Z" fill="#0EA5E9"/>
-      <rect x="-150" y="-60" width="150" height="60" rx="30" fill="#0EA5E9"/>
-      <text x="-75" y="-20" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold" fill="white">Let's learn!</text>
+      <path d="M0 0 L40 40 L0 80 Z" fill="#0EA5E9"/>
+      <rect x="-200" y="-80" width="200" height="80" rx="40" fill="#0EA5E9"/>
+      <text x="-100" y="-25" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="white">Let's learn!</text>
     </g>
     
     <g transform="translate(600, 120)" class="floating" style="animation-delay: 1.5s">
-      <path d="M0 0 L-30 30 L0 60 Z" fill="#0284C7"/>
-      <rect x="0" y="-60" width="150" height="60" rx="30" fill="#0284C7"/>
-      <text x="75" y="-20" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold" fill="white">I understand!</text>
+      <path d="M0 0 L-40 40 L0 80 Z" fill="#0284C7"/>
+      <rect x="0" y="-80" width="200" height="80" rx="40" fill="#0284C7"/>
+      <text x="100" y="-25" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="white">I understand!</text>
     </g>
     
     <!-- Decorative Elements -->
@@ -44,11 +52,12 @@
     <circle cx="900" cy="75" r="60" fill="#0284C7" opacity="0.2" class="pulsing" style="animation-delay: 1s"/>
     <circle cx="600" cy="600" r="75" fill="#0369A1" opacity="0.2" class="pulsing" style="animation-delay: 2s"/>
     
-    <!-- Progress Bar -->
-    <rect x="300" y="525" width="450" height="15" rx="7.5" fill="#E5E7EB"/>
-    <rect x="300" y="525" width="300" height="15" rx="7.5" fill="#0EA5E9"/>
+    <!-- Progress Bar Container -->
+    <rect x="300" y="525" width="450" height="20" rx="10" fill="#E5E7EB"/>
+    <!-- Progress Bar (will be animated by scroll) -->
+    <rect x="300" y="525" width="0" height="20" rx="10" fill="#0EA5E9" class="progress-bar"/>
     
     <!-- Progress Text -->
-    <text x="525" y="570" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="#4B5563">Learning Progress</text>
+    <text x="525" y="580" text-anchor="middle" font-family="Arial" font-size="28" font-weight="bold" fill="#4B5563">Learning Progress</text>
   </g>
 </svg> 
