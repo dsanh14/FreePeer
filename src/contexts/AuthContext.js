@@ -69,39 +69,36 @@ export function AuthProvider({ children }) {
     }
   }
 
-  async function signInWithGoogle() {
+  const signInWithGoogle = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
       
-      // Check if user exists in Firestore
+      // Check if user document exists
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       
       if (!userDoc.exists()) {
-        // Create new user document if it doesn't exist
+        // Create new user document
         await setDoc(doc(db, 'users', user.uid), {
           email: user.email,
-          role: 'student', // Default role for Google sign-in
           displayName: user.displayName,
           photoURL: user.photoURL,
-          createdAt: new Date().toISOString(),
-          lastLogin: new Date().toISOString()
+          role: 'student',
+          createdAt: new Date(),
+          onboardingCompleted: false
         });
-        setUserRole('student');
+        
+        return { user, needsOnboarding: true };
       } else {
-        // Update last login time for existing user
-        await setDoc(doc(db, 'users', user.uid), {
-          lastLogin: new Date().toISOString()
-        }, { merge: true });
-        setUserRole(userDoc.data().role);
+        // Check if onboarding is completed
+        const userData = userDoc.data();
+        return { user, needsOnboarding: !userData.onboardingCompleted };
       }
-
-      return user;
     } catch (error) {
-      setError(error.message);
+      console.error('Error signing in with Google:', error);
       throw error;
     }
-  }
+  };
 
   function logout() {
     return signOut(auth);

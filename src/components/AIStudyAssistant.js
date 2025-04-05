@@ -7,11 +7,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 
-// Initialize Gemini API with your API key directly
-// In a production environment, you should handle this more securely
-const API_KEY = "AIzaSyC-r-k3uCfZ367p-FElkHuv6NDUnLSThms"; // Replace with your actual API key
-//const API_KEY = process.env.GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(API_KEY);
+const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
 
 export default function AIStudyAssistant() {
   const [messages, setMessages] = useState([
@@ -26,6 +22,7 @@ export default function AIStudyAssistant() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [chatHistory, setChatHistory] = useState([]);
+  const [chat, setChat] = useState(null);
   const messagesEndRef = useRef(null);
 
   // Auto-scroll to bottom when messages change
@@ -45,50 +42,22 @@ export default function AIStudyAssistant() {
 
   const initializeChat = async () => {
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
-      const chat = model.startChat({
-        history: [],
-        generationConfig: {
-          maxOutputTokens: 2048,
-          temperature: 0.7,
-          topP: 0.8,
-          topK: 40,
-        },
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      const newChat = model.startChat({
+        history: [
+          {
+            role: "user",
+            parts: "You are a helpful study assistant. Your goal is to help students understand concepts, solve problems, and improve their learning. Be clear, concise, and encouraging. If a student asks about a specific subject, focus on explaining concepts in that subject area. Always maintain a supportive and educational tone."
+          },
+          {
+            role: "model",
+            parts: "I understand. I'll help students learn by explaining concepts clearly, providing step-by-step solutions, and offering encouragement. I'll focus on the specific subjects they're studying and maintain a supportive, educational approach to help them succeed."
+          }
+        ],
       });
-
-      const systemPrompt = `You are a knowledgeable and helpful study assistant specializing in ${
-        subjects.find(s => s.id === selectedSubject).name
-      }. 
-
-      Guidelines for your responses:
-      1. Maintain context of the conversation and refer back to previous questions when relevant
-      2. Use rich formatting in your responses:
-         - **Bold** for important terms and key concepts
-         - *Italics* for emphasis
-         - \`code blocks\` for formulas, equations, or code
-         - Bullet points for lists
-         - Numbered lists for steps or sequences
-         - Tables for comparing items
-         - > Blockquotes for important notes
-         - Mathematical notation when appropriate (e.g., $E = mc^2$)
-      3. Break down complex topics into digestible parts
-      4. Provide examples and real-world applications
-      5. If unsure, ask clarifying questions
-      6. Stay focused on the current subject but acknowledge connections to other fields
-
-      Remember to be educational, clear, and engaging in your responses.`;
-
-      await chat.sendMessage(systemPrompt);
-      setChatHistory([{ role: 'system', parts: systemPrompt }]);
-      return chat;
+      setChat(newChat);
     } catch (error) {
       console.error('Error initializing chat:', error);
-      if (error.message.includes('quota')) {
-        setError('API quota exceeded. Please try again in a minute.');
-      } else {
-        setError('Failed to initialize chat. Please refresh the page.');
-      }
-      throw error;
     }
   };
 
@@ -107,52 +76,24 @@ export default function AIStudyAssistant() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
-    
-    setError(null);
-    const userMessage = { id: messages.length + 1, text: input, sender: 'user' };
-    setMessages(prev => [...prev, userMessage]);
+    if (!input.trim() || !chat) return;
+
+    const userMessage = input.trim();
     setInput('');
+    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
 
     try {
-      const chat = await initializeChat();
-      
-      // Add previous context
-      for (const msg of chatHistory.slice(1)) {
-        await chat.sendMessage(msg.parts);
-      }
-
-      const result = await chat.sendMessage(input);
+      const result = await chat.sendMessage(userMessage);
       const response = await result.response;
       const text = response.text();
-
-      if (!text) {
-        throw new Error('Empty response from AI');
-      }
-
-      setChatHistory(prev => [
-        ...prev,
-        { role: 'user', parts: input },
-        { role: 'model', parts: text }
-      ]);
-
-      setMessages(prev => [...prev, {
-        id: prev.length + 1,
-        text: text,
-        sender: 'assistant'
-      }]);
+      
+      setMessages(prev => [...prev, { role: 'assistant', content: text }]);
     } catch (error) {
-      console.error('Error generating response:', error);
-      if (error.message.includes('quota')) {
-        setError('API quota exceeded. Please try again in a minute.');
-      } else {
-        setError('An error occurred while generating the response. Please try again.');
-      }
-      setMessages(prev => [...prev, {
-        id: prev.length + 1,
-        text: 'I apologize, but I encountered an error. Please try again.',
-        sender: 'assistant'
+      console.error('Error getting response:', error);
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: 'Sorry, I encountered an error. Please try again.' 
       }]);
     } finally {
       setIsLoading(false);
