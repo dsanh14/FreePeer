@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="1200" height="900" viewBox="0 0 1200 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
   <style>
     @keyframes float {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-15px); }
+      50% { transform: translateY(-10px); }
     }
     @keyframes pulse {
       0%, 100% { opacity: 0.2; }
@@ -22,41 +22,41 @@
   </style>
   
   <!-- Background -->
-  <rect width="1200" height="900" fill="#F0F7FF"/>
+  <rect width="800" height="600" fill="#F0F7FF"/>
   
   <!-- Modern Learning Scene -->
-  <g transform="translate(150, 150)">
+  <g transform="translate(100, 100)">
     <!-- Laptop -->
-    <rect x="300" y="225" width="450" height="270" rx="15" fill="#E5E7EB"/>
-    <rect x="330" y="255" width="390" height="210" rx="7.5" fill="#FFFFFF"/>
-    <rect x="330" y="255" width="390" height="30" rx="7.5" fill="#0EA5E9"/>
-    <rect x="330" y="300" width="390" height="30" rx="7.5" fill="#F3F4F6"/>
-    <rect x="330" y="345" width="300" height="30" rx="7.5" fill="#F3F4F6"/>
-    <rect x="330" y="390" width="270" height="30" rx="7.5" fill="#F3F4F6"/>
+    <rect x="200" y="150" width="300" height="180" rx="10" fill="#E5E7EB"/>
+    <rect x="220" y="170" width="260" height="140" rx="5" fill="#FFFFFF"/>
+    <rect x="220" y="170" width="260" height="20" rx="5" fill="#0EA5E9"/>
+    <rect x="220" y="200" width="260" height="20" rx="5" fill="#F3F4F6"/>
+    <rect x="220" y="230" width="200" height="20" rx="5" fill="#F3F4F6"/>
+    <rect x="220" y="260" width="180" height="20" rx="5" fill="#F3F4F6"/>
     
     <!-- Chat Bubbles -->
-    <g transform="translate(525, 50)" class="floating">
-      <path d="M0 0 L40 40 L0 80 Z" fill="#0EA5E9"/>
-      <rect x="-200" y="-80" width="200" height="80" rx="40" fill="#0EA5E9"/>
-      <text x="-100" y="-25" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="white">Let's learn!</text>
+    <g transform="translate(350, 30)" class="floating">
+      <path d="M0 0 L30 30 L0 60 Z" fill="#0EA5E9"/>
+      <rect x="-150" y="-60" width="150" height="60" rx="30" fill="#0EA5E9"/>
+      <text x="-75" y="-20" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold" fill="white">Let's learn!</text>
     </g>
     
-    <g transform="translate(525, 120)" class="floating" style="animation-delay: 1.5s">
-      <path d="M0 0 L-40 40 L0 80 Z" fill="#0284C7"/>
-      <rect x="0" y="-80" width="200" height="80" rx="40" fill="#0284C7"/>
-      <text x="100" y="-25" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="white">I understand!</text>
+    <g transform="translate(350, 80)" class="floating" style="animation-delay: 1.5s">
+      <path d="M0 0 L-30 30 L0 60 Z" fill="#0284C7"/>
+      <rect x="0" y="-60" width="150" height="60" rx="30" fill="#0284C7"/>
+      <text x="75" y="-20" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold" fill="white">I understand!</text>
     </g>
     
     <!-- Decorative Elements -->
-    <circle cx="250" cy="75" r="45" fill="#0EA5E9" opacity="0.2" class="pulsing"/>
-    <circle cx="1000" cy="75" r="60" fill="#0284C7" opacity="0.2" class="pulsing" style="animation-delay: 1s"/>
-    <circle cx="700" cy="600" r="75" fill="#0369A1" opacity="0.2" class="pulsing" style="animation-delay: 2s"/>
+    <circle cx="150" cy="50" r="30" fill="#0EA5E9" opacity="0.2" class="pulsing"/>
+    <circle cx="650" cy="50" r="40" fill="#0284C7" opacity="0.2" class="pulsing" style="animation-delay: 1s"/>
+    <circle cx="450" cy="400" r="50" fill="#0369A1" opacity="0.2" class="pulsing" style="animation-delay: 2s"/>
     
     <!-- Progress Bar -->
-    <rect x="300" y="525" width="450" height="20" rx="10" fill="#E5E7EB"/>
-    <rect x="300" y="525" width="300" height="20" rx="10" fill="#0EA5E9"/>
+    <rect x="200" y="350" width="300" height="15" rx="7.5" fill="#E5E7EB"/>
+    <rect x="200" y="350" width="200" height="15" rx="7.5" fill="#0EA5E9"/>
     
     <!-- Progress Text -->
-    <text x="525" y="580" text-anchor="middle" font-family="Arial" font-size="28" font-weight="bold" fill="#4B5563">Learning Progress</text>
+    <text x="350" y="380" text-anchor="middle" font-family="Arial" font-size="20" font-weight="bold" fill="#4B5563">Learning Progress</text>
   </g>
 </svg> 
