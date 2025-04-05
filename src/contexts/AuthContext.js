@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import { auth, db } from '../firebase';
 import { 
   GoogleAuthProvider,
@@ -11,6 +11,11 @@ import {
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 export const AuthContext = createContext();
+
+// Custom hook to use the auth context
+export function useAuth() {
+  return useContext(AuthContext);
+}
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
