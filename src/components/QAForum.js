@@ -59,22 +59,22 @@ export default function QAForum() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+    <div className="min-h-screen bg-[#F8FAFC] py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Q&A Forum
           </h1>
-          <p className="mt-3 text-xl text-gray-500 sm:mt-4">
+          <p className="text-xl text-gray-600">
             Ask questions and get help from the community
           </p>
         </div>
 
-        <div className="mt-8">
-          <form onSubmit={handleSubmit} className="bg-white shadow rounded-lg p-6">
-            <div className="space-y-4">
+        <div className="mb-12">
+          <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-8">
+            <div className="space-y-6">
               <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
                   Question Title
                 </label>
                 <input
@@ -82,40 +82,42 @@ export default function QAForum() {
                   id="title"
                   value={newQuestion.title}
                   onChange={(e) => setNewQuestion({ ...newQuestion, title: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-3"
+                  placeholder="What would you like to ask?"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="content" className="block text-sm font-medium text-gray-700">
-                  Question Content
+                <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
+                  Question Details
                 </label>
                 <textarea
                   id="content"
                   value={newQuestion.content}
                   onChange={(e) => setNewQuestion({ ...newQuestion, content: e.target.value })}
                   rows={4}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-3"
+                  placeholder="Provide more context about your question..."
                   required
                 />
               </div>
               <div>
-                <label htmlFor="tags" className="block text-sm font-medium text-gray-700">
-                  Tags (comma-separated)
+                <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-2">
+                  Tags
                 </label>
                 <input
                   type="text"
                   id="tags"
                   value={newQuestion.tags}
                   onChange={(e) => setNewQuestion({ ...newQuestion, tags: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="e.g., Mathematics, Algebra"
+                  className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-3"
+                  placeholder="e.g., Mathematics, Algebra (comma-separated)"
                 />
               </div>
               <div>
                 <button
                   type="submit"
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg text-base font-medium text-white bg-[#3B82F6] hover:bg-[#2563EB] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                 >
                   Post Question
                 </button>
@@ -124,22 +126,22 @@ export default function QAForum() {
           </form>
         </div>
 
-        <div className="mt-8 space-y-6">
+        <div className="space-y-6">
           {questions.map((question) => (
-            <div key={question.id} className="bg-white shadow rounded-lg overflow-hidden">
-              <div className="px-6 py-4">
-                <div className="flex items-center justify-between">
+            <div key={question.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
+              <div className="p-8">
+                <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold text-gray-900">{question.title}</h2>
                   <span className="text-sm text-gray-500">{question.date}</span>
                 </div>
-                <p className="mt-2 text-gray-600">{question.content}</p>
-                <div className="mt-4 flex items-center space-x-4">
+                <p className="text-gray-600 mb-4">{question.content}</p>
+                <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-500">By {question.author}</span>
-                  <div className="flex space-x-2">
+                  <div className="flex gap-2">
                     {question.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
                       >
                         {tag}
                       </span>
@@ -147,29 +149,30 @@ export default function QAForum() {
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-6 py-4">
-                <h3 className="text-lg font-medium text-gray-900">Answers</h3>
+              <div className="bg-gray-50 p-8">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Answers</h3>
                 {question.answers.map((answer) => (
-                  <div key={answer.id} className="mt-4">
-                    <div className="flex items-center justify-between">
+                  <div key={answer.id} className="mb-6 last:mb-0">
+                    <div className="flex items-center justify-between mb-2">
                       <span className="text-sm text-gray-500">By {answer.author}</span>
                       <span className="text-sm text-gray-500">{answer.date}</span>
                     </div>
-                    <p className="mt-2 text-gray-600">{answer.content}</p>
-                    <div className="mt-2 flex items-center">
-                      <button className="text-gray-500 hover:text-gray-700">
-                        <span className="text-sm">Upvote ({answer.upvotes})</span>
-                      </button>
-                    </div>
+                    <p className="text-gray-600 mb-3">{answer.content}</p>
+                    <button className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800">
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" />
+                      </svg>
+                      Upvote ({answer.upvotes})
+                    </button>
                   </div>
                 ))}
-                <div className="mt-4">
+                <div className="mt-6">
                   <textarea
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-3"
                     rows={3}
                     placeholder="Write your answer..."
                   />
-                  <button className="mt-2 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                  <button className="mt-3 inline-flex justify-center py-2 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-[#3B82F6] hover:bg-[#2563EB] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
                     Post Answer
                   </button>
                 </div>

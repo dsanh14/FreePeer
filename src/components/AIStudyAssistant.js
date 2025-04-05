@@ -29,29 +29,29 @@ export default function AIStudyAssistant() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+    <div className="min-h-screen bg-[#F8FAFC] py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
             AI Study Assistant
           </h1>
-          <p className="mt-3 text-xl text-gray-500 sm:mt-4">
+          <p className="text-xl text-gray-600">
             Get instant help with your study questions
           </p>
         </div>
 
-        <div className="mt-8 bg-white shadow rounded-lg overflow-hidden">
-          <div className="h-[600px] overflow-y-auto p-6 space-y-4">
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="h-[600px] overflow-y-auto p-8 space-y-6">
             {messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                  className={`max-w-[80%] rounded-xl px-6 py-4 ${
                     message.sender === 'user'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-900'
+                      ? 'bg-[#3B82F6] text-white'
+                      : 'bg-gray-50 text-gray-900'
                   }`}
                 >
                   {message.text}
@@ -60,23 +60,41 @@ export default function AIStudyAssistant() {
             ))}
           </div>
 
-          <div className="border-t border-gray-200 p-4">
-            <form onSubmit={handleSubmit} className="flex space-x-4">
+          <div className="border-t border-gray-100 p-6 bg-white">
+            <form onSubmit={handleSubmit} className="flex gap-4">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Type your question..."
-                className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-3"
               />
               <button
                 type="submit"
-                className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="inline-flex justify-center py-3 px-6 border border-transparent rounded-lg text-base font-medium text-white bg-[#3B82F6] hover:bg-[#2563EB] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
               >
                 Send
               </button>
             </form>
           </div>
+        </div>
+
+        <div className="mt-8 bg-white rounded-xl shadow-sm p-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Tips for Better Results</h2>
+          <ul className="space-y-3 text-gray-600">
+            <li className="flex items-center">
+              <span className="mr-2">📝</span>
+              Be specific with your questions
+            </li>
+            <li className="flex items-center">
+              <span className="mr-2">🎯</span>
+              Include relevant context
+            </li>
+            <li className="flex items-center">
+              <span className="mr-2">💡</span>
+              Ask follow-up questions for clarity
+            </li>
+          </ul>
         </div>
       </div>
     </div>
