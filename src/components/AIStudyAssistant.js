@@ -2,12 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Initialize Gemini API with error handling
-let genAI;
-try {
-  genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY);
-} catch (error) {
-  console.error('Error initializing Gemini API:', error);
-}
+const initializeAI = () => {
+  const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+  if (!apiKey) {
+    console.error('Gemini API key is missing');
+    return null;
+  }
+  try {
+    return new GoogleGenerativeAI(apiKey);
+  } catch (error) {
+    console.error('Error initializing Gemini API:', error);
+    return null;
+  }
+};
 
 export default function AIStudyAssistant() {
   const [messages, setMessages] = useState([
@@ -21,11 +28,16 @@ export default function AIStudyAssistant() {
   const [selectedSubject, setSelectedSubject] = useState('general');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [genAI, setGenAI] = useState(null);
 
-  // Verify API key on component mount
+  // Initialize AI on component mount
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
-      setError('Gemini API key is missing. Please check your environment variables.');
+    const ai = initializeAI();
+    if (ai) {
+      setGenAI(ai);
+      setError(null);
+    } else {
+      setError('AI service initialization failed. Please check your API key configuration.');
     }
   }, []);
 
@@ -79,14 +91,12 @@ export default function AIStudyAssistant() {
     try {
       // Generate content with Gemini
       const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-      const chat = model.startChat({
-        history: messages.map(msg => ({
-          role: msg.sender === 'user' ? 'user' : 'model',
-          parts: [{ text: msg.text }]
-        }))
-      });
+      
+      const prompt = `You are a helpful and knowledgeable study assistant specializing in ${
+        subjects.find(s => s.id === selectedSubject).name
+      }. Please provide a clear and educational response to this question: ${input}`;
 
-      const result = await chat.sendMessage(input);
+      const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
 
