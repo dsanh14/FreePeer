@@ -4,6 +4,7 @@ import { Box } from '@chakra-ui/react';
 import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
+import Landing from './pages/Landing';
 import Home from './pages/Home';
 import AIChat from './pages/AIChat';
 import TutorMatch from './pages/TutorMatch';
@@ -18,6 +19,12 @@ function PrivateRoute({ children }) {
   return currentUser ? children : <Navigate to="/login" />;
 }
 
+// Public Route component (redirects to home if user is logged in)
+function PublicRoute({ children }) {
+  const { currentUser } = useAuth();
+  return currentUser ? <Navigate to="/home" /> : children;
+}
+
 function App() {
   return (
     <Router>
@@ -26,10 +33,25 @@ function App() {
           <Navbar />
           <Box p={4}>
             <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+              <Route path="/" element={<Landing />} />
               <Route
-                path="/"
+                path="/login"
+                element={
+                  <PublicRoute>
+                    <Login />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/signup"
+                element={
+                  <PublicRoute>
+                    <Signup />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/home"
                 element={
                   <PrivateRoute>
                     <Home />
