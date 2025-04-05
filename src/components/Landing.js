@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Landing() {
   const svgRef = useRef(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,40 +15,16 @@ export default function Landing() {
       if (isVisible) {
         svg.style.opacity = '1';
         svg.style.transform = 'translateY(0)';
-        
-        // Calculate scroll progress based on the visible portion of the SVG
-        const progress = Math.min(1, Math.max(0, 
-          (window.innerHeight - rect.top) / (rect.height * 0.5) // Only use top half for progress
-        ));
-        setScrollProgress(progress);
-        
-        // Update progress bar width
-        const progressBar = document.getElementById('progress-bar');
-        if (progressBar) {
-          progressBar.style.width = `${progress * 450}px`; // Full width of container
-        }
       } else {
         svg.style.opacity = '0';
         svg.style.transform = 'translateY(20px)';
       }
     };
 
-    // Use requestAnimationFrame for smoother animations
-    let ticking = false;
-    const scrollHandler = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          handleScroll();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', scrollHandler, { passive: true });
+    window.addEventListener('scroll', handleScroll);
     handleScroll(); // Initial check
 
-    return () => window.removeEventListener('scroll', scrollHandler);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (

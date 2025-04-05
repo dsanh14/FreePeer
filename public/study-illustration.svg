@@ -35,13 +35,13 @@
     <rect x="330" y="390" width="270" height="30" rx="7.5" fill="#F3F4F6"/>
     
     <!-- Chat Bubbles -->
-    <g transform="translate(550, 150)" class="floating">
+    <g transform="translate(525, 50)" class="floating">
       <path d="M0 0 L40 40 L0 80 Z" fill="#0EA5E9"/>
       <rect x="-200" y="-80" width="200" height="80" rx="40" fill="#0EA5E9"/>
       <text x="-100" y="-25" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="white">Let's learn!</text>
     </g>
     
-    <g transform="translate(700, 120)" class="floating" style="animation-delay: 1.5s">
+    <g transform="translate(525, 120)" class="floating" style="animation-delay: 1.5s">
       <path d="M0 0 L-40 40 L0 80 Z" fill="#0284C7"/>
       <rect x="0" y="-80" width="200" height="80" rx="40" fill="#0284C7"/>
       <text x="100" y="-25" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="white">I understand!</text>
@@ -52,10 +52,9 @@
     <circle cx="1000" cy="75" r="60" fill="#0284C7" opacity="0.2" class="pulsing" style="animation-delay: 1s"/>
     <circle cx="700" cy="600" r="75" fill="#0369A1" opacity="0.2" class="pulsing" style="animation-delay: 2s"/>
     
-    <!-- Progress Bar Container -->
+    <!-- Progress Bar -->
     <rect x="300" y="525" width="450" height="20" rx="10" fill="#E5E7EB"/>
-    <!-- Progress Bar (will be animated by scroll) -->
-    <rect x="300" y="525" width="0" height="20" rx="10" fill="#0EA5E9" id="progress-bar"/>
+    <rect x="300" y="525" width="300" height="20" rx="10" fill="#0EA5E9"/>
     
     <!-- Progress Text -->
     <text x="525" y="580" text-anchor="middle" font-family="Arial" font-size="28" font-weight="bold" fill="#4B5563">Learning Progress</text>
