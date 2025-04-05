@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+// Initialize Gemini API
+const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY);
 
 export default function AIStudyAssistant() {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: 'Hello! I\'m your AI study assistant. How can I help you today?',
+      text: 'Hello! I\'m your AI study assistant powered by Gemini. How can I help you today?',
       sender: 'assistant'
     }
   ]);
   const [input, setInput] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('general');
+  const [isLoading, setIsLoading] = useState(false);
 
   const subjects = [
     { id: 'general', name: 'General', icon: '📚' },
@@ -24,22 +29,47 @@ export default function AIStudyAssistant() {
     { id: 'languages', name: 'Languages', icon: '🌎' }
   ];
 
-  const handleSubmit = (e) => {
+  const generatePrompt = (userInput, subject) => {
+    const currentSubject = subjects.find(s => s.id === subject).name;
+    return `You are a helpful and knowledgeable study assistant specializing in ${currentSubject}. 
+    Provide clear, accurate, and educational responses.
+    If the question is about a different subject, still try to help but mention that you specialize in ${currentSubject}.
+    
+    User's question: ${userInput}`;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || isLoading) return;
 
-    // Add user message
-    setMessages([...messages, { id: messages.length + 1, text: input, sender: 'user' }]);
+    const userMessage = { id: messages.length + 1, text: input, sender: 'user' };
+    setMessages(prev => [...prev, userMessage]);
     setInput('');
+    setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      // Generate content with Gemini
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      const prompt = generatePrompt(input, selectedSubject);
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+
       setMessages(prev => [...prev, {
         id: prev.length + 1,
-        text: `I'll help you with your ${subjects.find(s => s.id === selectedSubject).name} question. This is a simulated response.`,
+        text: text,
         sender: 'assistant'
       }]);
-    }, 1000);
+    } catch (error) {
+      console.error('Error generating response:', error);
+      setMessages(prev => [...prev, {
+        id: prev.length + 1,
+        text: 'I apologize, but I encountered an error. Please try again.',
+        sender: 'assistant'
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -101,6 +131,17 @@ export default function AIStudyAssistant() {
               </div>
             </div>
           ))}
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="max-w-[80%] rounded-xl px-4 py-2 bg-gray-50 text-gray-900">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Input Area */}
@@ -112,12 +153,18 @@ export default function AIStudyAssistant() {
               onChange={(e) => setInput(e.target.value)}
               placeholder={`Ask a question about ${subjects.find(s => s.id === selectedSubject).name.toLowerCase()}...`}
               className="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2"
+              disabled={isLoading}
             />
             <button
               type="submit"
-              className="inline-flex justify-center py-2 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-[#3B82F6] hover:bg-[#2563EB] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              disabled={isLoading}
+              className={`inline-flex justify-center py-2 px-4 border border-transparent rounded-lg text-sm font-medium text-white ${
+                isLoading 
+                  ? 'bg-blue-400 cursor-not-allowed'
+                  : 'bg-[#3B82F6] hover:bg-[#2563EB] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+              } transition-colors`}
             >
-              Send
+              {isLoading ? 'Sending...' : 'Send'}
             </button>
           </form>
         </div>
