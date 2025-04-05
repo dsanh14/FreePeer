@@ -16,6 +16,8 @@ import Unauthorized from './components/Unauthorized';
 import StudyResources from './components/StudyResources';
 import QAForum from './components/QAForum';
 import AIStudyAssistant from './components/AIStudyAssistant';
+import Profile from './components/Profile';
+import Leaderboard from './components/Leaderboard';
 
 function App() {
   return (
@@ -87,6 +89,26 @@ function App() {
               <PrivateRoute roles={['student']}>
                 <Layout>
                   <AIStudyAssistant />
+                </Layout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute roles={['student']}>
+                <Layout>
+                  <Profile />
+                </Layout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/leaderboard"
+            element={
+              <PrivateRoute roles={['student']}>
+                <Layout>
+                  <Leaderboard />
                 </Layout>
               </PrivateRoute>
             }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { NavLink } from 'react-router-dom';
 
 export default function Layout({ children }) {
   const { currentUser, logout } = useAuth();
@@ -32,56 +33,76 @@ export default function Layout({ children }) {
               </Link>
               {currentUser && (
                 <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                  <Link
-                    to="/home"
-                    className={`${
-                      location.pathname === '/home'
-                        ? 'border-[#3B82F6] text-gray-900'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                    } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                  <NavLink
+                    to="/dashboard"
+                    className={({ isActive }) =>
+                      `text-sm font-medium ${
+                        isActive ? 'text-[#3B82F6]' : 'text-gray-600 hover:text-gray-900'
+                      }`
+                    }
                   >
                     Dashboard
-                  </Link>
-                  <Link
+                  </NavLink>
+                  <NavLink
                     to="/find-tutors"
-                    className={`${
-                      location.pathname === '/find-tutors'
-                        ? 'border-[#3B82F6] text-gray-900'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                    } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                    className={({ isActive }) =>
+                      `text-sm font-medium ${
+                        isActive ? 'text-[#3B82F6]' : 'text-gray-600 hover:text-gray-900'
+                      }`
+                    }
                   >
                     Find Tutors
-                  </Link>
-                  <Link
-                    to="/study-resources"
-                    className={`${
-                      location.pathname === '/study-resources'
-                        ? 'border-[#3B82F6] text-gray-900'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                    } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                  </NavLink>
+                  <NavLink
+                    to="/resources"
+                    className={({ isActive }) =>
+                      `text-sm font-medium ${
+                        isActive ? 'text-[#3B82F6]' : 'text-gray-600 hover:text-gray-900'
+                      }`
+                    }
                   >
                     Resources
-                  </Link>
-                  <Link
+                  </NavLink>
+                  <NavLink
                     to="/qa-forum"
-                    className={`${
-                      location.pathname === '/qa-forum'
-                        ? 'border-[#3B82F6] text-gray-900'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                    } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                    className={({ isActive }) =>
+                      `text-sm font-medium ${
+                        isActive ? 'text-[#3B82F6]' : 'text-gray-600 hover:text-gray-900'
+                      }`
+                    }
                   >
                     Q&A Forum
-                  </Link>
-                  <Link
-                    to="/ai-study-assistant"
-                    className={`${
-                      location.pathname === '/ai-study-assistant'
-                        ? 'border-[#3B82F6] text-gray-900'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                    } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                  </NavLink>
+                  <NavLink
+                    to="/ai-assistant"
+                    className={({ isActive }) =>
+                      `text-sm font-medium ${
+                        isActive ? 'text-[#3B82F6]' : 'text-gray-600 hover:text-gray-900'
+                      }`
+                    }
                   >
                     AI Assistant
-                  </Link>
+                  </NavLink>
+                  <NavLink
+                    to="/leaderboard"
+                    className={({ isActive }) =>
+                      `text-sm font-medium ${
+                        isActive ? 'text-[#3B82F6]' : 'text-gray-600 hover:text-gray-900'
+                      }`
+                    }
+                  >
+                    Leaderboard
+                  </NavLink>
+                  <NavLink
+                    to="/profile"
+                    className={({ isActive }) =>
+                      `text-sm font-medium ${
+                        isActive ? 'text-[#3B82F6]' : 'text-gray-600 hover:text-gray-900'
+                      }`
+                    }
+                  >
+                    Profile
+                  </NavLink>
                 </div>
               )}
             </div>
@@ -105,13 +126,10 @@ export default function Layout({ children }) {
                 <div className="flex items-center space-x-4">
                   <button
                     onClick={handleLogout}
-                    className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
+                    className="w-8 h-8 rounded-full bg-[#3B82F6] text-white flex items-center justify-center text-sm font-medium"
                   >
-                    Log Out
+                    {currentUser.displayName?.[0] || '?'}
                   </button>
-                  <div className="h-8 w-8 rounded-full bg-[#3B82F6] text-white flex items-center justify-center">
-                    {currentUser.email[0].toUpperCase()}
-                  </div>
                 </div>
               )}
             </div>
