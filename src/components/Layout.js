@@ -28,7 +28,7 @@ export default function Layout({ children }) {
           <div className="flex justify-between h-16">
             <div className="flex">
               <Link to="/" className="flex-shrink-0 flex items-center">
-                <span className="text-2xl font-bold text-primary-600">StudyBuddy Connect</span>
+                <span className="text-2xl font-bold text-[#3B82F6]">StudyBuddy Connect</span>
               </Link>
               {currentUser && (
                 <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
@@ -36,31 +36,51 @@ export default function Layout({ children }) {
                     to="/home"
                     className={`${
                       location.pathname === '/home'
-                        ? 'border-primary-500 text-gray-900'
+                        ? 'border-[#3B82F6] text-gray-900'
                         : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                     } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
                   >
                     Dashboard
                   </Link>
                   <Link
-                    to="/tutoring"
+                    to="/find-tutors"
                     className={`${
-                      location.pathname === '/tutoring'
-                        ? 'border-primary-500 text-gray-900'
+                      location.pathname === '/find-tutors'
+                        ? 'border-[#3B82F6] text-gray-900'
                         : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                     } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
                   >
                     Find Tutors
                   </Link>
                   <Link
-                    to="/ai-help"
+                    to="/study-resources"
                     className={`${
-                      location.pathname === '/ai-help'
-                        ? 'border-primary-500 text-gray-900'
+                      location.pathname === '/study-resources'
+                        ? 'border-[#3B82F6] text-gray-900'
                         : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                     } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
                   >
-                    AI Help
+                    Resources
+                  </Link>
+                  <Link
+                    to="/qa-forum"
+                    className={`${
+                      location.pathname === '/qa-forum'
+                        ? 'border-[#3B82F6] text-gray-900'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                    } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                  >
+                    Q&A Forum
+                  </Link>
+                  <Link
+                    to="/ai-study-assistant"
+                    className={`${
+                      location.pathname === '/ai-study-assistant'
+                        ? 'border-[#3B82F6] text-gray-900'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                    } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                  >
+                    AI Assistant
                   </Link>
                 </div>
               )}
@@ -76,7 +96,7 @@ export default function Layout({ children }) {
                   </Link>
                   <Link
                     to="/signup"
-                    className="bg-primary-600 text-white hover:bg-primary-700 px-4 py-2 rounded-md text-sm font-medium"
+                    className="bg-[#3B82F6] text-white hover:bg-[#2563EB] px-4 py-2 rounded-md text-sm font-medium transition-colors"
                   >
                     Sign Up
                   </Link>
@@ -89,7 +109,7 @@ export default function Layout({ children }) {
                   >
                     Log Out
                   </button>
-                  <div className="h-8 w-8 rounded-full bg-primary-600 text-white flex items-center justify-center">
+                  <div className="h-8 w-8 rounded-full bg-[#3B82F6] text-white flex items-center justify-center">
                     {currentUser.email[0].toUpperCase()}
                   </div>
                 </div>
@@ -115,9 +135,9 @@ export default function Layout({ children }) {
             <div>
               <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><Link to="/about" className="hover:text-white">About Us</Link></li>
-                <li><Link to="/features" className="hover:text-white">Features</Link></li>
-                <li><Link to="/resources" className="hover:text-white">Resources</Link></li>
+                <li><Link to="/study-resources" className="hover:text-white">Resources</Link></li>
+                <li><Link to="/qa-forum" className="hover:text-white">Q&A Forum</Link></li>
+                <li><Link to="/find-tutors" className="hover:text-white">Find Tutors</Link></li>
               </ul>
             </div>
             <div>
