@@ -1,98 +1,69 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Box } from '@chakra-ui/react';
 import { AuthProvider } from './contexts/AuthContext';
-import { useAuth } from './contexts/AuthContext';
-import Navbar from './components/Navbar';
-import Landing from './pages/Landing';
-import Home from './pages/Home';
+import Layout from './components/Layout';
+import Landing from './components/Landing';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import Home from './components/Home';
+import PrivateRoute from './components/PrivateRoute';
 import AIChat from './pages/AIChat';
 import TutorMatch from './pages/TutorMatch';
 import QnAForum from './pages/QnAForum';
 import Profile from './pages/Profile';
-import Login from './components/Login';
-import Signup from './components/Signup';
-
-// Protected Route component
-function PrivateRoute({ children }) {
-  const { currentUser } = useAuth();
-  return currentUser ? children : <Navigate to="/login" />;
-}
-
-// Public Route component (redirects to home if user is logged in)
-function PublicRoute({ children }) {
-  const { currentUser } = useAuth();
-  return currentUser ? <Navigate to="/home" /> : children;
-}
 
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <Box minH="100vh">
-          <Navbar />
-          <Box p={4}>
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route
-                path="/login"
-                element={
-                  <PublicRoute>
-                    <Login />
-                  </PublicRoute>
-                }
-              />
-              <Route
-                path="/signup"
-                element={
-                  <PublicRoute>
-                    <Signup />
-                  </PublicRoute>
-                }
-              />
-              <Route
-                path="/home"
-                element={
-                  <PrivateRoute>
-                    <Home />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/ai-chat"
-                element={
-                  <PrivateRoute>
-                    <AIChat />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/tutor-match"
-                element={
-                  <PrivateRoute>
-                    <TutorMatch />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/qna-forum"
-                element={
-                  <PrivateRoute>
-                    <QnAForum />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  <PrivateRoute>
-                    <Profile />
-                  </PrivateRoute>
-                }
-              />
-            </Routes>
-          </Box>
-        </Box>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route
+              path="/home"
+              element={
+                <PrivateRoute>
+                  <Home />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/ai-chat"
+              element={
+                <PrivateRoute>
+                  <AIChat />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/tutor-match"
+              element={
+                <PrivateRoute>
+                  <TutorMatch />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/qna-forum"
+              element={
+                <PrivateRoute>
+                  <QnAForum />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <PrivateRoute>
+                  <Profile />
+                </PrivateRoute>
+              }
+            />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </Layout>
       </AuthProvider>
     </Router>
   );
