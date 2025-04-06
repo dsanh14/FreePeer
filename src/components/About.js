@@ -3,18 +3,21 @@ import React from 'react';
 export default function About() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">About StudyBuddy Connect</h1>
-          <p className="text-xl text-gray-600">Connecting students for better learning experiences</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">About FreePeer</h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Empowering students through peer-to-peer learning and AI-powered assistance
+          </p>
         </div>
 
         {/* Mission Section */}
-        <div className="bg-white rounded-lg shadow-md p-8 mb-12">
+        <div className="bg-white rounded-lg shadow-sm p-8 mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Our Mission</h2>
-          <p className="text-gray-600 mb-8">
-            StudyBuddy Connect was founded with a simple yet powerful mission: to make quality education accessible to everyone.
-            We believe that learning should be collaborative, engaging, and available to all students, regardless of their background or circumstances.
+          <p className="text-gray-600 mb-6">
+            FreePeer was founded with a simple yet powerful mission: to make quality education accessible to everyone. 
+            We believe that learning should be free, collaborative, and supported by the latest technology.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-gray-50 p-6 rounded-lg">
@@ -95,8 +98,8 @@ export default function About() {
         <div className="bg-white rounded-lg shadow-sm p-8 mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Our Team</h2>
           <p className="text-gray-600 mb-8">
-            StudyBuddy Connect is built by a passionate team of educators, developers, and students who believe in the
-            power of collaborative learning. We're dedicated to creating tools that help students succeed.
+            FreePeer is built by a passionate team of educators, developers, and students who believe in the 
+            power of collaborative learning and technology to transform education.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
@@ -115,9 +118,6 @@ export default function About() {
               <p className="text-gray-600">Lead Developer</p>
             </div>
           </div>
-          <p className="text-gray-600">
-            Join us in our mission to transform education through StudyBuddy Connect's collaborative learning platform.
-          </p>
         </div>
 
         {/* CTA Section */}
@@ -125,7 +125,7 @@ export default function About() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Join Our Community</h2>
           <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
             Ready to start your learning journey? Join thousands of students who are already benefiting from 
-            StudyBuddy Connect's collaborative learning platform.
+            FreePeer's collaborative learning platform.
           </p>
           <div className="flex justify-center space-x-4">
             <a

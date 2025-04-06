@@ -20,6 +20,18 @@ export default function Layout({ children }) {
     return <>{children}</>;
   }
 
+  const navigation = [
+    {
+      name: 'Sessions',
+      href: '/sessions',
+      icon: (props) => (
+        <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+        </svg>
+      ),
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Navigation */}
@@ -28,11 +40,11 @@ export default function Layout({ children }) {
           <div className="flex justify-between h-16">
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
-                <Link to="/" className="text-2xl font-bold text-primary-600">
-                  StudyBuddy Connect
+                <Link to="/" className="text-2xl font-bold text-[#3B82F6]">
+                  FreePeer
                 </Link>
               </div>
-              <div className="hidden sm:ml-12 sm:flex sm:space-x-8">
+              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                 <NavLink
                   to="/home"
                   className={({ isActive }) =>
@@ -114,7 +126,7 @@ export default function Layout({ children }) {
                     onClick={() => setShowProfileMenu(!showProfileMenu)}
                     className="flex items-center space-x-2 focus:outline-none"
                   >
-                    <div className="w-10 h-10 rounded-full bg-[#3B82F6] text-white flex items-center justify-center text-base font-medium">
+                    <div className="w-8 h-8 rounded-full bg-[#3B82F6] text-white flex items-center justify-center text-sm font-medium">
                       {currentUser.displayName?.[0] || '?'}
                     </div>
                   </button>
@@ -169,7 +181,7 @@ export default function Layout({ children }) {
         <div className="max-w-[95%] xl:max-w-[90%] 2xl:max-w-[85%] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4">StudyBuddy Connect</h3>
+              <h3 className="text-lg font-semibold mb-4">FreePeer</h3>
               <p className="text-gray-400">Making quality education accessible to everyone.</p>
             </div>
             <div>

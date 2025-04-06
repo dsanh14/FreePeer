@@ -15,6 +15,11 @@ import Profile from './components/Profile';
 import Leaderboard from './components/Leaderboard';
 import Onboarding from './components/Onboarding';
 import About from './components/About';
+import SeedTutors from './components/SeedTutors';
+import Unauthorized from './components/Unauthorized';
+import FindTutor from './components/FindTutor';
+import ScheduledSessions from './components/ScheduledSessions';
+import Conference from './components/Conference';
 
 function App() {
   return (
@@ -41,9 +46,9 @@ function App() {
           <Route
             path="/find-tutors"
             element={
-              <PrivateRoute roles={['student']}>
+              <PrivateRoute>
                 <Layout>
-                  <FindTutors />
+                  <FindTutor />
                 </Layout>
               </PrivateRoute>
             }
@@ -104,6 +109,35 @@ function App() {
               <PrivateRoute>
                 <Layout>
                   <Onboarding />
+                </Layout>
+              </PrivateRoute>
+            }
+          />
+          <Route path="/unauthorized" element={<Unauthorized />} />
+          <Route 
+            path="/seed-tutors" 
+            element={
+              <PrivateRoute requireAdmin={true}>
+                <SeedTutors />
+              </PrivateRoute>
+            } 
+          />
+          <Route
+            path="/sessions"
+            element={
+              <PrivateRoute>
+                <Layout>
+                  <ScheduledSessions />
+                </Layout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/conference/:sessionId"
+            element={
+              <PrivateRoute>
+                <Layout>
+                  <Conference />
                 </Layout>
               </PrivateRoute>
             }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -12,14 +12,16 @@ const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
 export default function AIStudyAssistant() {
   const [messages, setMessages] = useState([
     {
-      role: 'assistant',
-      content: 'Hello! I\'m your AI study assistant powered by Gemini. How can I help you today?'
+      id: 1,
+      text: 'Hello! I\'m your AI study assistant powered by Gemini. How can I help you today?',
+      sender: 'assistant'
     }
   ]);
   const [input, setInput] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('general');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [chatHistory, setChatHistory] = useState([]);
   const [chat, setChat] = useState(null);
   const messagesEndRef = useRef(null);
 
@@ -28,30 +30,9 @@ export default function AIStudyAssistant() {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
     }
-  }, [messages, isLoading]);
+  }, [messages]);
 
-  const initializeChat = useCallback(async () => {
-    try {
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-      const newChat = model.startChat({
-        history: [
-          {
-            role: "user",
-            parts: "You are a helpful study assistant. Your goal is to help students understand concepts, solve problems, and improve their learning. Be clear, concise, and encouraging. If a student asks about a specific subject, focus on explaining concepts in that subject area. Always maintain a supportive and educational tone."
-          },
-          {
-            role: "model",
-            parts: "I understand. I'll help students learn by explaining concepts clearly, providing step-by-step solutions, and offering encouragement. I'll focus on the specific subjects they're studying and maintain a supportive, educational approach to help them succeed."
-          }
-        ],
-      });
-      setChat(newChat);
-    } catch (error) {
-      console.error('Error initializing chat:', error);
-      setError('Failed to initialize chat. Please refresh the page.');
-    }
-  }, []);
-
+  // Initialize the chat model on component mount
   useEffect(() => {
     try {
       initializeChat();
@@ -59,10 +40,28 @@ export default function AIStudyAssistant() {
       console.error('Chat initialization error:', err);
       setError('Failed to initialize chat. Please refresh the page.');
     }
-    return () => {
-      setChat(null);
-    };
-  }, [selectedSubject, initializeChat]);
+  }, [selectedSubject]); // Reinitialize when subject changes
+
+  const initializeChat = async () => {
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
+      const newChat = model.startChat({
+        history: [
+          {
+            role: "user",
+            parts: [{ text: "You are a helpful study assistant. Your goal is to help students understand concepts, solve problems, and improve their learning. Be clear, concise, and encouraging. If a student asks about a specific subject, focus on explaining concepts in that subject area. Always maintain a supportive and educational tone." }]
+          },
+          {
+            role: "model",
+            parts: [{ text: "I understand. I'll help students learn by explaining concepts clearly, providing step-by-step solutions, and offering encouragement. I'll focus on the specific subjects they're studying and maintain a supportive, educational approach to help them succeed." }]
+          }
+        ],
+      });
+      setChat(newChat);
+    } catch (error) {
+      console.error('Error initializing chat:', error);
+    }
+  };
 
   const subjects = [
     { id: 'general', name: 'General', icon: '📚' },
@@ -83,23 +82,36 @@ export default function AIStudyAssistant() {
 
     const userMessage = input.trim();
     setInput('');
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    setMessages(prev => [...prev, { id: Date.now(), text: userMessage, sender: 'user' }]);
     setIsLoading(true);
 
     try {
-      const result = await chat.sendMessage(userMessage);
+      const result = await chat.sendMessage([{ text: userMessage }]);
       const response = await result.response;
       const text = response.text();
       
-      setMessages(prev => [...prev, { role: 'assistant', content: text }]);
+      setMessages(prev => [...prev, { 
+        id: Date.now(), 
+        text: text, 
+        sender: 'assistant' 
+      }]);
     } catch (error) {
       console.error('Error getting response:', error);
       setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: 'Sorry, I encountered an error. Please try again.' 
+        id: Date.now(),
+        text: 'Sorry, I encountered an error. Please try again.', 
+        sender: 'assistant' 
       }]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Handle Enter key press
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
     }
   };
 
@@ -226,30 +238,30 @@ export default function AIStudyAssistant() {
 
         {/* Chat Area with rich text support */}
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4" style={{ maxHeight: 'calc(100vh - 15rem)' }}>
-          {messages.map((message, index) => (
+          {messages.map((message) => (
             <div
-              key={`message-${index}`}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              key={message.id}
+              className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
                 className={`max-w-[80%] rounded-xl px-4 py-2 ${
-                  message.role === 'user'
+                  message.sender === 'user'
                     ? 'bg-[#3B82F6] text-white'
-                    : 'bg-gray-50 text-gray-900'
+                    : 'bg-white text-gray-900 shadow-sm border border-gray-200'
                 }`}
               >
-                {message.role === 'assistant' ? (
+                {message.sender === 'assistant' ? (
                   <div className="prose prose-sm max-w-none">
                     <ReactMarkdown
                       remarkPlugins={[remarkMath]}
                       rehypePlugins={[rehypeKatex]}
                       components={MarkdownComponents}
                     >
-                      {message.content}
+                      {message.text}
                     </ReactMarkdown>
                   </div>
                 ) : (
-                  message.content
+                  message.text
                 )}
               </div>
             </div>
@@ -275,13 +287,14 @@ export default function AIStudyAssistant() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
               placeholder={`Ask a question about ${subjects.find(s => s.id === selectedSubject).name.toLowerCase()}...`}
               className="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2"
               disabled={isLoading}
             />
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || !input.trim()}
               className={`inline-flex justify-center py-2 px-4 border border-transparent rounded-lg text-sm font-medium text-white ${
                 isLoading
                   ? 'bg-blue-400 cursor-not-allowed'
