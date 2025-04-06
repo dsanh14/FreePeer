@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 
 export default function Dashboard() {
-  const { currentUser, userRole } = useAuth();
+  const { currentUser, userRole, userData } = useAuth();
 
   // Mock data - replace with actual data from your backend
   const stats = {
@@ -36,10 +36,15 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Welcome back, {currentUser?.displayName || 'Student'}!</h1>
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 tracking-tight mb-4">
+            {userData?.role === 'tutor' 
+              ? 'Welcome back Tutor'
+              : `Welcome back ${userData?.displayName || 'Student'}`
+            }
+          </h1>
           <p className="mt-2 text-gray-600">Here's your learning progress</p>
         </div>
 

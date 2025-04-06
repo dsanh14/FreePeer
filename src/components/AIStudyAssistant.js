@@ -192,7 +192,7 @@ export default function AIStudyAssistant() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[80%] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="h-[calc(100vh-8rem)] bg-[#F8FAFC] flex">
           {/* Subject Sidebar */}
           <div className="w-64 bg-white border-r border-gray-200 flex flex-col">

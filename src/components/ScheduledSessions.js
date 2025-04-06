@@ -209,7 +209,15 @@ export default function ScheduledSessions() {
   };
 
   const isStudent = () => {
-    return currentUser?.role === 'student';
+    return userData?.role === 'student';
+  };
+
+  const formatTime = (timestamp) => {
+    return new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true
+    }).format(timestamp);
   };
 
   if (loading) {
@@ -268,8 +276,8 @@ export default function ScheduledSessions() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 tracking-tight mb-4">
             {userData?.role === 'tutor' ? 'Your Tutoring Sessions' : 'Your Study Sessions'}
@@ -409,7 +417,7 @@ export default function ScheduledSessions() {
           </div>
         </div>
 
-        {/* Pre-session quiz section for students */}
+        {/* Pre-session quiz section - only visible to students */}
         {isStudent() && sessions.length > 0 && (
           <div className="mt-12">
             <div className="bg-white rounded-xl shadow-lg p-6">
@@ -425,7 +433,7 @@ export default function ScheduledSessions() {
                           Session with {session.tutorName}
                         </h3>
                         <p className="text-gray-600">
-                          {new Date(session.date).toLocaleDateString()} at {session.time}
+                          {new Date(session.startTime).toLocaleDateString()} at {formatTime(session.startTime)}
                         </p>
                         <p className="text-gray-600 mt-1">
                           Topic: {session.topic}

@@ -458,7 +458,7 @@ export default function FindTutors() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[80%] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="space-y-6">
           {/* Header */}
           <div className="bg-white rounded-lg shadow-sm p-6">
