@@ -17,6 +17,9 @@ import Conference from './components/Conference';
 import Profile from './components/Profile';
 import TutorProfile from './components/TutorProfile';
 import TutorOnboarding from './components/TutorOnboarding';
+import Games from './components/Games';
+import TextRPG from './components/TextRPG';
+import MatchingGame from './components/MatchingGame';
 
 function App() {
   return (
@@ -117,6 +120,9 @@ function App() {
                   </PrivateRoute>
                 }
               />
+              <Route path="/games" element={<Games />} />
+              <Route path="/games/text-rpg" element={<TextRPG />} />
+              <Route path="/games/matching" element={<MatchingGame />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
