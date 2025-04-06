@@ -90,4 +90,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Chakra UI for the component library
 - Firebase for backend services
-- OpenAI for AI capabilities
+- Gemini for AI capabilities
