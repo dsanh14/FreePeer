@@ -23,8 +23,3 @@ yarn-debug.log*
 yarn-error.log*
 
 backend/node_modules
-backend/package-lock.json
-backend/package.json
-backend/yarn.lock
-backend/yarn-debug.log*
-backend/yarn-error.log*
