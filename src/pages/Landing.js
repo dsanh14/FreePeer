@@ -1,9 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaGraduationCap, FaRobot, FaUsers, FaChartLine } from 'react-icons/fa';
+import { useAuth } from '../contexts/AuthContext';
 
 function Landing() {
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
 
   const features = [
     {
@@ -44,18 +46,29 @@ function Landing() {
             </p>
             <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left">
               <div className="space-x-4">
-                <button
-                  onClick={() => navigate('/signup')}
-                  className="btn-primary"
-                >
-                  Get Started
-                </button>
-                <button
-                  onClick={() => navigate('/login')}
-                  className="btn-outline"
-                >
-                  Log In
-                </button>
+                {!currentUser ? (
+                  <>
+                    <button
+                      onClick={() => navigate('/signup')}
+                      className="btn-primary"
+                    >
+                      Get Started
+                    </button>
+                    <button
+                      onClick={() => navigate('/login')}
+                      className="btn-outline"
+                    >
+                      Log In
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => navigate('/dashboard')}
+                    className="btn-primary"
+                  >
+                    Go to Dashboard
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -110,23 +123,25 @@ function Landing() {
       </div>
 
       {/* CTA Section */}
-      <div className="bg-primary-700">
-        <div className="max-w-2xl mx-auto text-center py-16 px-4 sm:py-20 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
-            <span className="block">Ready to boost your learning?</span>
-            <span className="block">Start using StudyBuddy Connect today.</span>
-          </h2>
-          <p className="mt-4 text-lg leading-6 text-primary-100">
-            Join thousands of students who are already improving their grades with our platform.
-          </p>
-          <button
-            onClick={() => navigate('/signup')}
-            className="mt-8 w-full inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-primary-600 bg-white hover:bg-primary-50 sm:w-auto"
-          >
-            Sign up for free
-          </button>
+      {!currentUser && (
+        <div className="bg-primary-700">
+          <div className="max-w-2xl mx-auto text-center py-16 px-4 sm:py-20 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
+              <span className="block">Ready to boost your learning?</span>
+              <span className="block">Start using StudyBuddy Connect today.</span>
+            </h2>
+            <p className="mt-4 text-lg leading-6 text-primary-100">
+              Join thousands of students who are already improving their grades with our platform.
+            </p>
+            <button
+              onClick={() => navigate('/signup')}
+              className="mt-8 w-full inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-primary-600 bg-white hover:bg-primary-50 sm:w-auto"
+            >
+              Sign up for free
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

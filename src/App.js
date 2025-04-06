@@ -17,6 +17,7 @@ import TextRPG from './components/TextRPG';
 import MatchingGame from './components/MatchingGame';
 import TutorProfile from './components/TutorProfile';
 import QAForum from './components/QAForum';
+import Profile from './components/Profile';
 
 function AppRoutes() {
   const { currentUser, userData } = useAuth();
@@ -38,6 +39,7 @@ function AppRoutes() {
       <Route path="/games/text-rpg" element={currentUser ? <TextRPG /> : <Navigate to="/login" />} />
       <Route path="/games/matching" element={currentUser ? <MatchingGame /> : <Navigate to="/login" />} />
       <Route path="/tutor-profile" element={userData?.role === 'tutor' ? <TutorProfile /> : <Navigate to="/dashboard" />} />
+      <Route path="/profile" element={currentUser ? <Profile /> : <Navigate to="/login" />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
