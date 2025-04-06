@@ -457,284 +457,288 @@ export default function FindTutors() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Find Your Perfect Tutor</h1>
-            <p className="mt-2 text-gray-600">
-              Connect with experienced peer tutors who can help you succeed in your studies.
-            </p>
-          </div>
-          <div className="flex space-x-4">
-            <button
-              onClick={seedTutors}
-              className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-            >
-              Seed Tutors
-            </button>
-            <FindMatchButton tutors={tutors} />
-          </div>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Subject Filter */}
-          <div>
-            <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
-              Subject
-            </label>
-            <select
-              id="subject"
-              value={selectedSubject}
-              onChange={(e) => setSelectedSubject(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 hover:border-primary-500 transition-colors duration-200"
-            >
-              {subjects.map((subject) => (
-                <option key={subject.id} value={subject.id}>
-                  {subject.icon} {subject.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Availability Filter */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Availability
-            </label>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-              {availabilityOptions.map((option) => (
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Find Your Perfect Tutor</h1>
+                <p className="mt-2 text-gray-600">
+                  Connect with experienced peer tutors who can help you succeed in your studies.
+                </p>
+              </div>
+              <div className="flex space-x-4">
                 <button
-                  key={option.id}
-                  onClick={() => toggleAvailability(option.name)}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 ${
-                    selectedAvailability.includes(option.name)
-                      ? 'bg-primary-50 border-primary-500 text-primary-700'
-                      : 'bg-white border-gray-200 text-gray-700 hover:border-primary-300'
-                  }`}
+                  onClick={seedTutors}
+                  className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                 >
-                  <span>{option.icon}</span>
-                  <span className="text-sm">{option.name}</span>
+                  Seed Tutors
                 </button>
-              ))}
+                <FindMatchButton tutors={tutors} />
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Filter Stats */}
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <div className="flex justify-between items-center text-sm text-gray-500">
-            <span>{stats.count} tutors found</span>
-            {stats.count > 0 && (
-              <div className="flex space-x-4">
-                <span>Average Rating: ⭐ {stats.avgRating}</span>
+          {/* Filters */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Subject Filter */}
+              <div>
+                <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
+                  Subject
+                </label>
+                <select
+                  id="subject"
+                  value={selectedSubject}
+                  onChange={(e) => setSelectedSubject(e.target.value)}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-600 focus:ring-primary-600 hover:border-primary-500 transition-colors duration-200"
+                >
+                  {subjects.map((subject) => (
+                    <option key={subject.id} value={subject.id}>
+                      {subject.icon} {subject.name}
+                    </option>
+                  ))}
+                </select>
               </div>
-            )}
-          </div>
-        </div>
-      </div>
 
-      {/* Tutor List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredTutors.map((tutor) => (
-          <div 
-            key={tutor.id} 
-            data-tutor-id={tutor.id}
-            className="bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md hover:translate-y-[-2px] flex flex-col h-full"
-          >
-            <div className="p-6 flex flex-col h-full">
-              <div className="flex items-center space-x-4">
-                <div className="relative">
-                  <img
-                    src={tutor.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(tutor.name || 'Tutor')}&background=random`}
-                    alt={tutor.name}
-                    className="h-16 w-16 rounded-full object-cover ring-2 ring-transparent hover:ring-primary-500 transition-all duration-200"
-                  />
-                  {tutor.availability && (
-                    <div className="absolute bottom-0 right-0 bg-green-500 rounded-full w-4 h-4 border-2 border-white"></div>
-                  )}
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 hover:text-primary-600 transition-colors duration-200">
-                    {tutor.name}
-                  </h3>
-                  <div className="flex items-center text-sm text-gray-500">
-                    <span className="flex items-center">
-                      <svg className="h-4 w-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      {tutor.rating || 'No ratings yet'} ({tutor.reviews || 0} reviews)
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-4 flex-grow">
-                <div className="text-sm text-gray-500">Subjects</div>
-                <div className="mt-1 flex flex-wrap gap-2">
-                  {tutor.subjects?.map((subject, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800"
+              {/* Availability Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Availability
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {availabilityOptions.map((option) => (
+                    <button
+                      key={option.id}
+                      onClick={() => toggleAvailability(option.name)}
+                      className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-200 ${
+                        selectedAvailability.includes(option.name)
+                          ? 'bg-primary-50 border-primary-500 text-primary-700'
+                          : 'bg-white border-gray-200 text-gray-700 hover:border-primary-300'
+                      }`}
                     >
-                      {subject}
-                    </span>
+                      <span>{option.icon}</span>
+                      <span className="text-sm">{option.name}</span>
+                    </button>
                   ))}
                 </div>
               </div>
-              <div className="mt-4">
-                <div className="text-sm text-gray-500">Grade Levels</div>
-                <div className="mt-1 flex flex-wrap gap-2">
-                  {tutor.gradeLevels?.map((level, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                    >
-                      {level}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div className="mt-4">
-                <div className="text-sm text-gray-500">Availability</div>
-                <div className="mt-1 flex flex-wrap gap-2">
-                  {tutor.availability?.map((slot, index) => {
-                    const [day, time] = slot.split(' ');
-                    if (time) {
-                      return (
-                        <span
-                          key={index}
-                          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
-                        >
-                          {day} {formatTimeRange(time)}
-                        </span>
-                      );
-                    }
-                    return (
-                      <span
-                        key={index}
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
-                      >
-                        {slot}
-                      </span>
-                    );
-                  })}
-                </div>
-                {getBestTimes(tutor) && (
-                  <div className="mt-2 text-sm text-gray-600">
-                    Best time: {getBestTimes(tutor)}
+            </div>
+
+            {/* Filter Stats */}
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <div className="flex justify-between items-center text-sm text-gray-500">
+                <span>{stats.count} tutors found</span>
+                {stats.count > 0 && (
+                  <div className="flex space-x-4">
+                    <span>Average Rating: ⭐ {stats.avgRating}</span>
                   </div>
                 )}
               </div>
-              <div className="mt-6">
-                <button
-                  onClick={() => {
-                    setSelectedTutor(tutor);
-                    setScheduleData(prev => ({
-                      ...prev,
-                      subject: tutor.subjects?.[0] || ''
-                    }));
-                    setShowScheduleOverlay(true);
-                  }}
-                  className="w-full bg-primary-600 text-white px-4 py-2 rounded-md font-medium hover:bg-primary-500 transform hover:translate-y-[-1px] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
-                >
-                  Schedule Session
-                </button>
-              </div>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Schedule Session Overlay */}
-      {showScheduleOverlay && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h2 className="text-xl font-bold mb-4">Schedule Session with {selectedTutor?.name}</h2>
-            <form onSubmit={handleScheduleSession}>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Subject</label>
-                  <select
-                    value={scheduleData.subject}
-                    onChange={(e) => setScheduleData({ ...scheduleData, subject: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                    required
-                  >
-                    <option value="">Select a subject</option>
-                    {selectedTutor?.subjects?.map((subject, index) => (
-                      <option key={index} value={subject}>{subject}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Topic</label>
-                  <input
-                    type="text"
-                    value={scheduleData.topic}
-                    onChange={(e) => setScheduleData({ ...scheduleData, topic: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                    placeholder="What would you like to learn?"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Date</label>
-                  <input
-                    type="date"
-                    value={scheduleData.date}
-                    onChange={(e) => setScheduleData({ ...scheduleData, date: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                    min={new Date().toISOString().split('T')[0]}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Time</label>
-                  <input
-                    type="time"
-                    value={scheduleData.time}
-                    onChange={(e) => setScheduleData({ ...scheduleData, time: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Duration (minutes)</label>
-                  <select
-                    value={scheduleData.duration}
-                    onChange={(e) => setScheduleData({ ...scheduleData, duration: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                  >
-                    <option value="30">30 minutes</option>
-                    <option value="60">1 hour</option>
-                    <option value="90">1.5 hours</option>
-                    <option value="120">2 hours</option>
-                  </select>
+          {/* Tutor List */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredTutors.map((tutor) => (
+              <div 
+                key={tutor.id} 
+                data-tutor-id={tutor.id}
+                className="bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md hover:translate-y-[-2px] flex flex-col h-full"
+              >
+                <div className="p-6 flex flex-col h-full">
+                  <div className="flex items-center space-x-4">
+                    <div className="relative">
+                      <img
+                        src={tutor.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(tutor.name || 'Tutor')}&background=random`}
+                        alt={tutor.name}
+                        className="h-16 w-16 rounded-full object-cover ring-2 ring-transparent hover:ring-primary-500 transition-all duration-200"
+                      />
+                      {tutor.availability && (
+                        <div className="absolute bottom-0 right-0 bg-green-500 rounded-full w-4 h-4 border-2 border-white"></div>
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 hover:text-primary-600 transition-colors duration-200">
+                        {tutor.name}
+                      </h3>
+                      <div className="flex items-center text-sm text-gray-500">
+                        <span className="flex items-center">
+                          <svg className="h-4 w-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                          {tutor.rating || 'No ratings yet'} ({tutor.reviews || 0} reviews)
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex-grow">
+                    <div className="text-sm text-gray-500">Subjects</div>
+                    <div className="mt-1 flex flex-wrap gap-2">
+                      {tutor.subjects?.map((subject, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800"
+                        >
+                          {subject}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <div className="text-sm text-gray-500">Grade Levels</div>
+                    <div className="mt-1 flex flex-wrap gap-2">
+                      {tutor.gradeLevels?.map((level, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                        >
+                          {level}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <div className="text-sm text-gray-500">Availability</div>
+                    <div className="mt-1 flex flex-wrap gap-2">
+                      {tutor.availability?.map((slot, index) => {
+                        const [day, time] = slot.split(' ');
+                        if (time) {
+                          return (
+                            <span
+                              key={index}
+                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                            >
+                              {day} {formatTimeRange(time)}
+                            </span>
+                          );
+                        }
+                        return (
+                          <span
+                            key={index}
+                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                          >
+                            {slot}
+                          </span>
+                        );
+                      })}
+                    </div>
+                    {getBestTimes(tutor) && (
+                      <div className="mt-2 text-sm text-gray-600">
+                        Best time: {getBestTimes(tutor)}
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-6">
+                    <button
+                      onClick={() => {
+                        setSelectedTutor(tutor);
+                        setScheduleData(prev => ({
+                          ...prev,
+                          subject: tutor.subjects?.[0] || ''
+                        }));
+                        setShowScheduleOverlay(true);
+                      }}
+                      className="w-full bg-primary-600 text-white px-4 py-2 rounded-md font-medium hover:bg-primary-500 transform hover:translate-y-[-1px] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600"
+                    >
+                      Schedule Session
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div className="mt-6 flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setShowScheduleOverlay(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                >
-                  Schedule Session
-                </button>
-              </div>
-            </form>
+            ))}
           </div>
+
+          {/* Schedule Session Overlay */}
+          {showScheduleOverlay && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                <h2 className="text-xl font-bold mb-4">Schedule Session with {selectedTutor?.name}</h2>
+                <form onSubmit={handleScheduleSession}>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Subject</label>
+                      <select
+                        value={scheduleData.subject}
+                        onChange={(e) => setScheduleData({ ...scheduleData, subject: e.target.value })}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                        required
+                      >
+                        <option value="">Select a subject</option>
+                        {selectedTutor?.subjects?.map((subject, index) => (
+                          <option key={index} value={subject}>{subject}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Topic</label>
+                      <input
+                        type="text"
+                        value={scheduleData.topic}
+                        onChange={(e) => setScheduleData({ ...scheduleData, topic: e.target.value })}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                        placeholder="What would you like to learn?"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Date</label>
+                      <input
+                        type="date"
+                        value={scheduleData.date}
+                        onChange={(e) => setScheduleData({ ...scheduleData, date: e.target.value })}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                        min={new Date().toISOString().split('T')[0]}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Time</label>
+                      <input
+                        type="time"
+                        value={scheduleData.time}
+                        onChange={(e) => setScheduleData({ ...scheduleData, time: e.target.value })}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Duration (minutes)</label>
+                      <select
+                        value={scheduleData.duration}
+                        onChange={(e) => setScheduleData({ ...scheduleData, duration: e.target.value })}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                      >
+                        <option value="30">30 minutes</option>
+                        <option value="60">1 hour</option>
+                        <option value="90">1.5 hours</option>
+                        <option value="120">2 hours</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="mt-6 flex justify-end space-x-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowScheduleOverlay(false)}
+                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                    >
+                      Schedule Session
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 } 

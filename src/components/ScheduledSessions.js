@@ -3,6 +3,14 @@ import { collection, query, where, getDocs, addDoc, updateDoc, doc, orderBy } fr
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+
+const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
 export default function ScheduledSessions() {
   const [sessions, setSessions] = useState([]);
@@ -10,6 +18,14 @@ export default function ScheduledSessions() {
   const [error, setError] = useState('');
   const { currentUser, userData } = useAuth();
   const navigate = useNavigate();
+  const [quizTopic, setQuizTopic] = useState('');
+  const [quiz, setQuiz] = useState(null);
+  const [quizLoading, setQuizLoading] = useState(false);
+  const [quizError, setQuizError] = useState('');
+  const [userAnswers, setUserAnswers] = useState({});
+  const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [quizScore, setQuizScore] = useState(null);
+  const [showQuizOverlay, setShowQuizOverlay] = useState(false);
 
   useEffect(() => {
     fetchSessions();
@@ -98,6 +114,102 @@ export default function ScheduledSessions() {
     } else {
       return 'active';
     }
+  };
+
+  const generateQuiz = async (topic) => {
+    setQuizLoading(true);
+    setQuizError('');
+    setQuiz(null);
+    setUserAnswers({});
+    setQuizSubmitted(false);
+    setQuizScore(null);
+
+    try {
+      const prompt = `Create a 5-question multiple-choice quiz about ${topic}.
+      Each question should test understanding of key concepts that might be covered in a tutoring session.
+      Use markdown formatting for emphasis and important points.
+      For any mathematical equations, use LaTeX format between $$ for display equations or $ for inline equations.
+      Format the response as a JSON object:
+      {
+        "title": "Quiz Title",
+        "questions": [
+          {
+            "question": "Question text with markdown and LaTeX",
+            "options": [
+              {"text": "Option 1 with markdown and LaTeX", "isCorrect": false},
+              {"text": "Option 2 with markdown and LaTeX", "isCorrect": false},
+              {"text": "Option 3 with markdown and LaTeX", "isCorrect": true},
+              {"text": "Option 4 with markdown and LaTeX", "isCorrect": false}
+            ]
+          }
+        ]
+      }`;
+
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      
+      try {
+        const cleanedText = text
+          .replace(/```json\n|\n```/g, '')
+          .replace(/```/g, '')
+          .trim();
+        
+        const parsedResponse = JSON.parse(cleanedText);
+        
+        if (!parsedResponse.questions || !Array.isArray(parsedResponse.questions)) {
+          throw new Error('Invalid quiz format');
+        }
+        
+        setQuiz(parsedResponse);
+      } catch (err) {
+        console.error('Quiz parsing error:', err);
+        setQuizError('Failed to generate quiz. Please try again.');
+      }
+    } catch (err) {
+      console.error('Quiz generation error:', err);
+      setQuizError('Failed to generate quiz. Please try again.');
+    } finally {
+      setQuizLoading(false);
+    }
+  };
+
+  const handleQuizSubmit = () => {
+    if (!quiz) return;
+
+    let score = 0;
+    quiz.questions.forEach((question, index) => {
+      const correctOption = question.options.find(opt => opt.isCorrect);
+      if (userAnswers[index] === correctOption.text) {
+        score++;
+      }
+    });
+
+    setQuizScore(score);
+    setQuizSubmitted(true);
+  };
+
+  const formatResponse = (text) => {
+    return (
+      <ReactMarkdown
+        remarkPlugins={[remarkMath]}
+        rehypePlugins={[rehypeKatex]}
+        components={{
+          p: ({ node, ...props }) => <p className="mb-4" {...props} />,
+          strong: ({ node, ...props }) => <strong className="font-semibold" {...props} />,
+          em: ({ node, ...props }) => <em className="italic" {...props} />,
+          ul: ({ node, ...props }) => <ul className="list-disc pl-4 mb-4" {...props} />,
+          ol: ({ node, ...props }) => <ol className="list-decimal pl-4 mb-4" {...props} />,
+          li: ({ node, ...props }) => <li className="mb-2" {...props} />,
+        }}
+      >
+        {text}
+      </ReactMarkdown>
+    );
+  };
+
+  const isStudent = () => {
+    return currentUser?.role === 'student';
   };
 
   if (loading) {
@@ -296,6 +408,152 @@ export default function ScheduledSessions() {
             </div>
           </div>
         </div>
+
+        {/* Pre-session quiz section for students */}
+        {isStudent() && sessions.length > 0 && (
+          <div className="mt-12">
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Prepare for your upcoming session
+              </h2>
+              <div className="space-y-4">
+                {sessions.map((session) => (
+                  <div key={session.id} className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          Session with {session.tutorName}
+                        </h3>
+                        <p className="text-gray-600">
+                          {new Date(session.date).toLocaleDateString()} at {session.time}
+                        </p>
+                        <p className="text-gray-600 mt-1">
+                          Topic: {session.topic}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setShowQuizOverlay(true);
+                          generateQuiz(session.topic);
+                        }}
+                        className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                      >
+                        Take Pre-Session Quiz
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Quiz Overlay */}
+        {showQuizOverlay && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl shadow-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  {quiz?.title || 'Pre-Session Quiz'}
+                </h2>
+                <button
+                  onClick={() => {
+                    setShowQuizOverlay(false);
+                    setQuiz(null);
+                    setQuizSubmitted(false);
+                  }}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {quizLoading ? (
+                <div className="flex justify-center items-center h-64">
+                  <div className="flex space-x-2">
+                    <div className="w-3 h-3 bg-primary-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-3 h-3 bg-primary-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-3 h-3 bg-primary-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  </div>
+                </div>
+              ) : quizError ? (
+                <div className="text-red-600 text-center py-4">{quizError}</div>
+              ) : quiz ? (
+                <div className="space-y-8">
+                  {quiz.questions.map((question, index) => (
+                    <div key={index} className="space-y-4">
+                      <div className="prose max-w-none">
+                        {formatResponse(question.question)}
+                      </div>
+                      
+                      <div className="space-y-2">
+                        {question.options.map((option, optionIndex) => (
+                          <label
+                            key={optionIndex}
+                            className={`flex items-center p-3 rounded-lg border cursor-pointer ${
+                              quizSubmitted
+                                ? option.isCorrect
+                                  ? 'border-green-500 bg-green-50'
+                                  : userAnswers[index] === option.text
+                                    ? 'border-red-500 bg-red-50'
+                                    : 'border-gray-200'
+                                : userAnswers[index] === option.text
+                                  ? 'border-primary-500 bg-primary-50'
+                                  : 'border-gray-200 hover:border-primary-500'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name={`question-${index}`}
+                              value={option.text}
+                              checked={userAnswers[index] === option.text}
+                              onChange={() => {
+                                if (!quizSubmitted) {
+                                  setUserAnswers(prev => ({
+                                    ...prev,
+                                    [index]: option.text
+                                  }));
+                                }
+                              }}
+                              className="hidden"
+                            />
+                            <div className="prose max-w-none">
+                              {formatResponse(option.text)}
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+
+                  {!quizSubmitted ? (
+                    <button
+                      onClick={handleQuizSubmit}
+                      className="w-full py-3 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                    >
+                      Submit Quiz
+                    </button>
+                  ) : (
+                    <div className="text-center">
+                      <p className="text-lg font-semibold text-gray-900">
+                        Your score: {quizScore} out of {quiz.questions.length}
+                      </p>
+                      <p className="text-gray-600 mt-2">
+                        {quizScore === quiz.questions.length
+                          ? 'Perfect! You\'re ready for the session!'
+                          : quizScore >= quiz.questions.length / 2
+                            ? 'Good job! You have a solid understanding.'
+                            : 'Consider reviewing the topic before the session.'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

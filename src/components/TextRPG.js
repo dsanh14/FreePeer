@@ -46,6 +46,14 @@ export default function TextRPG() {
     );
   };
 
+  const formatStatsGain = (stats) => {
+    const gains = [];
+    if (stats.knowledge > 0) gains.push(`+${stats.knowledge} Knowledge`);
+    if (stats.wisdom > 0) gains.push(`+${stats.wisdom} Wisdom`);
+    if (stats.experience > 0) gains.push(`+${stats.experience} Experience`);
+    return gains.join(', ');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!topic.trim()) {
@@ -115,14 +123,21 @@ export default function TextRPG() {
 
   const generateQuestion = async () => {
     setLoading(true);
+    setError('');
     try {
       const prompt = `Based on the story about ${topic} and the choice "${selectedChoice.text}", 
       generate a challenging multiple-choice question that tests understanding of the educational content.
+      Use markdown formatting for emphasis, lists, and important points.
+      For any mathematical equations, use LaTeX format between $$ for display equations or $ for inline equations.
       Format the response as a JSON object:
       {
-        "question": "The question text",
-        "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
-        "correctAnswer": "The correct option"
+        "question": "The question text with markdown and LaTeX formatting",
+        "options": [
+          {"text": "Option 1 with markdown and LaTeX", "isCorrect": false},
+          {"text": "Option 2 with markdown and LaTeX", "isCorrect": false},
+          {"text": "Option 3 with markdown and LaTeX", "isCorrect": true},
+          {"text": "Option 4 with markdown and LaTeX", "isCorrect": false}
+        ]
       }`;
 
       const result = await model.generateContent(prompt);
@@ -130,15 +145,24 @@ export default function TextRPG() {
       const text = response.text();
       
       try {
-        const cleanedText = text.replace(/```json\n|\n```/g, '').trim();
+        const cleanedText = text
+          .replace(/```json\n|\n```/g, '')
+          .replace(/```/g, '')
+          .trim();
+        
         const parsedResponse = JSON.parse(cleanedText);
+        
+        if (!parsedResponse.question || !parsedResponse.options || !Array.isArray(parsedResponse.options)) {
+          throw new Error('Invalid question format');
+        }
+        
         setQuestion(parsedResponse);
       } catch (err) {
-        console.error('Parsing error:', err);
+        console.error('Question parsing error:', err);
         setError('Failed to generate question. Please try again.');
       }
     } catch (err) {
-      console.error('API error:', err);
+      console.error('Question generation error:', err);
       setError('Failed to generate question. Please try again.');
     } finally {
       setLoading(false);
@@ -326,19 +350,11 @@ export default function TextRPG() {
                     disabled={loading}
                     className="w-full text-left p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200 hover:border-primary-500"
                   >
-                    <div className="flex justify-between items-center">
+                    <div className="flex flex-col">
                       <span className="text-gray-700">{choice.text}</span>
-                      <div className="flex space-x-2 text-sm">
-                        {choice.stats?.knowledge > 0 && (
-                          <span className="text-primary-600">+{choice.stats.knowledge} Knowledge</span>
-                        )}
-                        {choice.stats?.wisdom > 0 && (
-                          <span className="text-primary-600">+{choice.stats.wisdom} Wisdom</span>
-                        )}
-                        {choice.stats?.experience > 0 && (
-                          <span className="text-primary-600">+{choice.stats.experience} Experience</span>
-                        )}
-                      </div>
+                      <span className="text-sm text-primary-600 mt-1">
+                        {formatStatsGain(choice.stats)}
+                      </span>
                     </div>
                   </button>
                 ))}
@@ -356,19 +372,23 @@ export default function TextRPG() {
                 ) : (
                   <>
                     <div className="bg-white rounded-xl shadow-lg p-6">
-                      <h3 className="text-lg font-medium text-gray-900 mb-4">{question.question}</h3>
-                      <div className="space-y-3">
+                      <div className="prose max-w-none">
+                        {formatResponse(question.question)}
+                      </div>
+                      <div className="mt-4 space-y-2">
                         {question.options.map((option, index) => (
                           <button
                             key={index}
-                            onClick={() => setUserAnswer(option)}
+                            onClick={() => setUserAnswer(option.text)}
                             className={`w-full text-left p-3 rounded-lg border ${
-                              userAnswer === option
+                              userAnswer === option.text
                                 ? 'border-primary-500 bg-primary-50'
                                 : 'border-gray-200 hover:border-primary-500'
                             }`}
                           >
-                            {option}
+                            <div className="prose max-w-none">
+                              {formatResponse(option.text)}
+                            </div>
                           </button>
                         ))}
                       </div>

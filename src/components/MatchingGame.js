@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 export default function MatchingGame() {
   const [topic, setTopic] = useState('');
@@ -13,46 +17,97 @@ export default function MatchingGame() {
   const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
-  const generateCards = async () => {
-    if (!topic.trim()) {
-      setError('Please enter a valid academic topic');
-      return;
-    }
+  const formatResponse = (text) => {
+    return (
+      <ReactMarkdown
+        remarkPlugins={[remarkMath]}
+        rehypePlugins={[rehypeKatex]}
+        components={{
+          p: ({ node, ...props }) => <p className="mb-4" {...props} />,
+          strong: ({ node, ...props }) => <strong className="font-semibold" {...props} />,
+          em: ({ node, ...props }) => <em className="italic" {...props} />,
+          ul: ({ node, ...props }) => <ul className="list-disc pl-4 mb-4" {...props} />,
+          ol: ({ node, ...props }) => <ol className="list-decimal pl-4 mb-4" {...props} />,
+          li: ({ node, ...props }) => <li className="mb-2" {...props} />,
+        }}
+      >
+        {text}
+      </ReactMarkdown>
+    );
+  };
 
+  const generateCards = async () => {
     setLoading(true);
     setError('');
-
     try {
-      const prompt = `Create 8 educational matching pairs about ${topic}. 
+      const prompt = `Create 8 educational matching pairs about ${topic}.
       Each pair should consist of a term and its definition.
-      Format the response as a JSON array of objects with the following structure:
-      [
-        {"term": "Term 1", "definition": "Definition 1"},
-        {"term": "Term 2", "definition": "Definition 2"},
-        ...
-      ]`;
+      Use markdown formatting for emphasis and important points.
+      For any mathematical equations, use LaTeX format between $$ for display equations or $ for inline equations.
+      Format the response as a JSON object:
+      {
+        "pairs": [
+          {"term": "Term 1 with markdown and LaTeX", "definition": "Definition 1 with markdown and LaTeX"},
+          {"term": "Term 2 with markdown and LaTeX", "definition": "Definition 2 with markdown and LaTeX"},
+          {"term": "Term 3 with markdown and LaTeX", "definition": "Definition 3 with markdown and LaTeX"},
+          {"term": "Term 4 with markdown and LaTeX", "definition": "Definition 4 with markdown and LaTeX"},
+          {"term": "Term 5 with markdown and LaTeX", "definition": "Definition 5 with markdown and LaTeX"},
+          {"term": "Term 6 with markdown and LaTeX", "definition": "Definition 6 with markdown and LaTeX"},
+          {"term": "Term 7 with markdown and LaTeX", "definition": "Definition 7 with markdown and LaTeX"},
+          {"term": "Term 8 with markdown and LaTeX", "definition": "Definition 8 with markdown and LaTeX"}
+        ]
+      }`;
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
       
       try {
-        const pairs = JSON.parse(text);
-        // Create cards array with both terms and definitions
-        const newCards = pairs.flatMap(pair => [
-          { ...pair, type: 'term', id: Math.random() },
-          { ...pair, type: 'definition', id: Math.random() }
+        const cleanedText = text
+          .replace(/```json\n|\n```/g, '')
+          .replace(/```/g, '')
+          .trim();
+        
+        const parsedResponse = JSON.parse(cleanedText);
+        
+        if (!parsedResponse.pairs || !Array.isArray(parsedResponse.pairs) || parsedResponse.pairs.length !== 8) {
+          throw new Error('Invalid pairs format');
+        }
+        
+        // Validate each pair has the required properties
+        const validPairs = parsedResponse.pairs.every(pair => 
+          pair.term && pair.definition && 
+          typeof pair.term === 'string' && 
+          typeof pair.definition === 'string'
+        );
+        
+        if (!validPairs) {
+          throw new Error('Invalid pair format');
+        }
+        
+        // Create cards array with unique IDs
+        const cards = parsedResponse.pairs.flatMap(pair => [
+          { id: Math.random().toString(36).substr(2, 9), content: pair.term, type: 'term' },
+          { id: Math.random().toString(36).substr(2, 9), content: pair.definition, type: 'definition' }
         ]);
-        // Shuffle the cards
-        setCards(newCards.sort(() => Math.random() - 0.5));
+        
+        // Shuffle cards
+        for (let i = cards.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [cards[i], cards[j]] = [cards[j], cards[i]];
+        }
+        
+        setCards(cards);
         setFlippedCards([]);
         setMatchedPairs([]);
         setGameComplete(false);
       } catch (err) {
-        setError('Failed to parse the response. Please try again.');
+        console.error('Parsing error:', err);
+        setError('Failed to generate matching pairs. Please try again.');
       }
     } catch (err) {
-      setError('Failed to generate cards. Please try again.');
+      console.error('API error:', err);
+      setError('Failed to generate matching pairs. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -87,7 +142,7 @@ export default function MatchingGame() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Educational Matching Game</h1>
         
@@ -117,24 +172,23 @@ export default function MatchingGame() {
         ) : (
           <div className="space-y-6">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {cards.map((card, index) => (
-                <div
+              {cards.map((card) => (
+                <button
                   key={card.id}
-                  onClick={() => handleCardClick(index)}
-                  className={`aspect-square flex items-center justify-center p-4 rounded-lg cursor-pointer transition-all duration-300 ${
-                    flippedCards.includes(index) || matchedPairs.includes(index)
-                      ? 'bg-white shadow-lg'
+                  onClick={() => handleCardClick(card.id)}
+                  disabled={flippedCards.includes(card.id) || matchedPairs.includes(card.id)}
+                  className={`aspect-square rounded-lg shadow-md transition-all duration-200 ${
+                    flippedCards.includes(card.id) || matchedPairs.includes(card.id)
+                      ? 'bg-white'
                       : 'bg-primary-600 hover:bg-primary-700'
                   }`}
                 >
-                  {(flippedCards.includes(index) || matchedPairs.includes(index)) ? (
-                    <p className="text-center text-gray-700">
-                      {card.type === 'term' ? card.term : card.definition}
-                    </p>
-                  ) : (
-                    <span className="text-white">?</span>
-                  )}
-                </div>
+                  <div className="p-4 h-full flex items-center justify-center">
+                    <div className="prose max-w-none text-center">
+                      {formatResponse(card.content)}
+                    </div>
+                  </div>
+                </button>
               ))}
             </div>
 
