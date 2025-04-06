@@ -1,11 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, NavLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 
 export default function Layout({ children }) {
   const { currentUser, logout } = useAuth();
   const location = useLocation();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (currentUser) {
+        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+        if (userDoc.exists()) {
+          setUserRole(userDoc.data().role);
+        }
+      }
+    };
+
+    fetchUserRole();
+  }, [currentUser]);
 
   const handleLogout = async () => {
     try {
@@ -20,18 +36,6 @@ export default function Layout({ children }) {
     return <>{children}</>;
   }
 
-  const navigation = [
-    {
-      name: 'Sessions',
-      href: '/sessions',
-      icon: (props) => (
-        <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-        </svg>
-      ),
-    },
-  ];
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Navigation */}
@@ -45,8 +49,9 @@ export default function Layout({ children }) {
                 </Link>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+                {/* Public Navigation Items */}
                 <NavLink
-                  to="/home"
+                  to="/"
                   className={({ isActive }) =>
                     `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                       isActive
@@ -58,19 +63,7 @@ export default function Layout({ children }) {
                   Home
                 </NavLink>
                 <NavLink
-                  to="/find-tutors"
-                  className={({ isActive }) =>
-                    `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                      isActive
-                        ? 'border-[#3B82F6] text-gray-900'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                    }`
-                  }
-                >
-                  Find Tutors
-                </NavLink>
-                <NavLink
-                  to="/study-resources"
+                  to="/resources"
                   className={({ isActive }) =>
                     `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                       isActive
@@ -80,30 +73,6 @@ export default function Layout({ children }) {
                   }
                 >
                   Resources
-                </NavLink>
-                <NavLink
-                  to="/qa-forum"
-                  className={({ isActive }) =>
-                    `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                      isActive
-                        ? 'border-[#3B82F6] text-gray-900'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                    }`
-                  }
-                >
-                  Q&A Forum
-                </NavLink>
-                <NavLink
-                  to="/ai-study-assistant"
-                  className={({ isActive }) =>
-                    `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                      isActive
-                        ? 'border-[#3B82F6] text-gray-900'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                    }`
-                  }
-                >
-                  AI Assistant
                 </NavLink>
                 <NavLink
                   to="/leaderboard"
@@ -117,29 +86,80 @@ export default function Layout({ children }) {
                 >
                   Leaderboard
                 </NavLink>
+
+                {/* Protected Navigation Items */}
+                {currentUser && (
+                  <>
+                    <NavLink
+                      to="/scheduled-sessions"
+                      className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Sessions
+                    </NavLink>
+                    {userRole === 'student' && (
+                      <NavLink
+                        to="/find-tutors"
+                        className={({ isActive }) =>
+                          `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                            isActive
+                              ? 'border-[#3B82F6] text-gray-900'
+                              : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                          }`
+                        }
+                      >
+                        Find Tutors
+                      </NavLink>
+                    )}
+                    <NavLink
+                      to="/profile"
+                      className={({ isActive }) =>
+                        `inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                          isActive
+                            ? 'border-[#3B82F6] text-gray-900'
+                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                        }`
+                      }
+                    >
+                      Profile
+                    </NavLink>
+                  </>
+                )}
               </div>
             </div>
+
+            {/* Right side of navbar */}
             <div className="flex items-center">
               {currentUser ? (
                 <div className="relative">
                   <button
                     onClick={() => setShowProfileMenu(!showProfileMenu)}
-                    className="flex items-center space-x-2 focus:outline-none"
+                    className="flex items-center space-x-2 text-gray-700 hover:text-gray-900"
                   >
-                    <div className="w-8 h-8 rounded-full bg-[#3B82F6] text-white flex items-center justify-center text-sm font-medium">
-                      {currentUser.displayName?.[0] || '?'}
-                    </div>
+                    <span className="hidden sm:inline-block">{currentUser.email}</span>
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
                   </button>
+
                   {showProfileMenu && (
-                    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                       <div className="py-1">
-                        <NavLink
+                        <Link
                           to="/profile"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => setShowProfileMenu(false)}
                         >
                           Your Profile
-                        </NavLink>
+                        </Link>
                         <button
                           onClick={handleLogout}
                           className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -154,13 +174,13 @@ export default function Layout({ children }) {
                 <div className="flex space-x-4">
                   <Link
                     to="/login"
-                    className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#3B82F6] hover:bg-[#2563EB]"
                   >
                     Log in
                   </Link>
                   <Link
                     to="/signup"
-                    className="bg-[#3B82F6] text-white hover:bg-[#2563EB] px-4 py-2 rounded-md text-sm font-medium"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-[#3B82F6] bg-white hover:bg-gray-50"
                   >
                     Sign up
                   </Link>
@@ -171,7 +191,7 @@ export default function Layout({ children }) {
         </div>
       </nav>
 
-      {/* Main Content */}
+      {/* Main content */}
       <main className="max-w-[95%] xl:max-w-[90%] 2xl:max-w-[85%] mx-auto py-6 sm:px-6 lg:px-8">
         {children}
       </main>

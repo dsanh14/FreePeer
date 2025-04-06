@@ -1,29 +1,64 @@
 const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
 const axios = require('axios');
+const dotenv = require('dotenv');
+const cors = require('cors');
+const crypto = require('crypto');
 
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+// CORS configuration
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+};
+
+// Apply CORS middleware
+app.use(cors(corsOptions));
+
 app.use(express.json());
+
+// Basic route
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Welcome to the StudyBuddy Connect API',
+    status: 'running',
+    version: '1.0.0',
+    endpoints: {
+      test: '/api/test',
+      createZoomMeeting: '/api/create-zoom-meeting',
+      zoomSignature: '/api/zoom-signature'
+    }
+  });
+});
+
+// Test endpoint
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Test endpoint is working' });
+});
 
 // Get OAuth token
 const getZoomAccessToken = async () => {
   try {
     const credentials = Buffer.from(`${process.env.ZOOM_CLIENT_ID}:${process.env.ZOOM_CLIENT_SECRET}`).toString('base64');
+    
     const response = await axios.post(
-      'https://zoom.us/oauth/token?grant_type=account_credentials&account_id=Wd_Hs_sTQKGXFmFWz-BFYA',
-      null,
+      'https://zoom.us/oauth/token',
+      new URLSearchParams({
+        grant_type: 'account_credentials',
+        account_id: process.env.ZOOM_ACCOUNT_ID
+      }).toString(),
       {
         headers: {
           'Authorization': `Basic ${credentials}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/x-www-form-urlencoded'
         }
       }
     );
-
+    
     return response.data.access_token;
   } catch (error) {
     console.error('Error getting Zoom access token:', error.response?.data || error.message);
@@ -34,17 +69,16 @@ const getZoomAccessToken = async () => {
 // Create a Zoom Meeting
 app.post('/api/create-zoom-meeting', async (req, res) => {
   try {
+    console.log('Received request to create Zoom meeting:', req.body);
     const { topic, start_time, duration, timezone } = req.body;
     
-    // Get access token
     const accessToken = await getZoomAccessToken();
     
-    // Create meeting
     const response = await axios.post(
       'https://api.zoom.us/v2/users/me/meetings',
       {
         topic,
-        type: 2, // Scheduled meeting
+        type: 1,
         start_time,
         duration,
         timezone,
@@ -55,7 +89,9 @@ app.post('/api/create-zoom-meeting', async (req, res) => {
           mute_upon_entry: false,
           watermark: false,
           audio: 'both',
-          auto_recording: 'none'
+          auto_recording: 'none',
+          waiting_room: false,
+          allow_multiple_devices: true
         }
       },
       {
@@ -66,6 +102,7 @@ app.post('/api/create-zoom-meeting', async (req, res) => {
       }
     );
 
+    console.log('Successfully created Zoom meeting:', response.data);
     res.json({
       meetingId: response.data.id,
       joinUrl: response.data.join_url,
@@ -73,28 +110,28 @@ app.post('/api/create-zoom-meeting', async (req, res) => {
     });
   } catch (error) {
     console.error('Error creating Zoom meeting:', error.response?.data || error.message);
-    res.status(500).json({ error: 'Failed to create Zoom meeting' });
+    res.status(500).json({ 
+      error: 'Failed to create Zoom meeting',
+      details: error.response?.data || error.message
+    });
   }
 });
 
-// Generate Zoom Meeting Signature
-app.post('/api/zoom-signature', (req, res) => {
-  try {
-    const { meetingNumber, role } = req.body;
-    
-    const timestamp = new Date().getTime() - 30000;
-    const msg = Buffer.from(process.env.ZOOM_SDK_KEY + meetingNumber + timestamp + role).toString('base64');
-    const hash = crypto.createHmac('sha256', process.env.ZOOM_SDK_SECRET).update(msg).digest('base64');
-    const signature = Buffer.from(`${process.env.ZOOM_SDK_KEY}.${meetingNumber}.${timestamp}.${role}.${hash}`).toString('base64');
-
-    res.json({ signature });
-  } catch (error) {
-    console.error('Error generating signature:', error);
-    res.status(500).json({ error: 'Failed to generate signature' });
-  }
+// Error handling
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something went wrong' });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = 3001;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log('\n==========================================');
+  console.log('🚀 Server is running!');
+  console.log(`📡 Listening on port ${PORT}`);
+  console.log('------------------------------------------');
+  console.log('Available endpoints:');
+  console.log(`- GET  http://localhost:${PORT}/`);
+  console.log(`- GET  http://localhost:${PORT}/api/test`);
+  console.log(`- POST http://localhost:${PORT}/api/create-zoom-meeting`);
+  console.log('==========================================\n');
 }); 

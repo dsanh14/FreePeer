@@ -4,11 +4,10 @@ import { useAuth } from '../contexts/AuthContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
-export default function PrivateRoute({ children, requireAdmin = false }) {
-  const { currentUser } = useAuth();
+export default function PrivateRoute({ children, requireTutor = false }) {
+  const { currentUser, userData } = useAuth();
   const [isLoading, setIsLoading] = React.useState(true);
   const [isAuthorized, setIsAuthorized] = React.useState(false);
-  const [userRole, setUserRole] = React.useState(null);
 
   React.useEffect(() => {
     async function checkAuthorization() {
@@ -22,8 +21,7 @@ export default function PrivateRoute({ children, requireAdmin = false }) {
         const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
         if (userDoc.exists()) {
           const role = userDoc.data().role;
-          setUserRole(role);
-          setIsAuthorized(!requireAdmin || role === 'admin');
+          setIsAuthorized(!requireTutor || role === 'tutor');
         } else {
           setIsAuthorized(false);
         }
@@ -36,7 +34,7 @@ export default function PrivateRoute({ children, requireAdmin = false }) {
     }
 
     checkAuthorization();
-  }, [currentUser, requireAdmin]);
+  }, [currentUser, requireTutor]);
 
   if (isLoading) {
     return (
@@ -50,8 +48,8 @@ export default function PrivateRoute({ children, requireAdmin = false }) {
     return <Navigate to="/login" />;
   }
 
-  if (!isAuthorized) {
-    return <Navigate to="/unauthorized" />;
+  if (requireTutor && (!userData || userData.role !== 'tutor')) {
+    return <Navigate to="/" />;
   }
 
   return children;

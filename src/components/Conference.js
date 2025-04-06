@@ -27,8 +27,9 @@ export default function Conference() {
       }
 
       const sessionData = sessionDoc.data();
-      // Verify user is a participant
-      if (!sessionData.participants.includes(currentUser.uid)) {
+      
+      // Only verify user is a participant if they are logged in
+      if (currentUser && !sessionData.participants.includes(currentUser.uid)) {
         throw new Error('Unauthorized to join this session');
       }
 
@@ -48,21 +49,24 @@ export default function Conference() {
   const createZoomMeeting = async (sessionData) => {
     try {
       // Create a Zoom meeting using your backend API
-      const response = await fetch('/api/create-zoom-meeting', {
+      const response = await fetch('http://localhost:3001/api/create-zoom-meeting', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         body: JSON.stringify({
           topic: `${sessionData.subject} - ${sessionData.topic}`,
-          start_time: sessionData.startTime.toDate().toISOString(),
+          start_time: new Date().toISOString(), // Use current time for instant meetings
           duration: Math.ceil((sessionData.endTime.toDate() - sessionData.startTime.toDate()) / (60 * 1000)),
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create Zoom meeting');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create Zoom meeting');
       }
 
       const { meetingId, joinUrl, startUrl } = await response.json();
@@ -89,8 +93,13 @@ export default function Conference() {
   };
 
   const joinMeeting = () => {
-    // For tutors, use the start URL, for students use the join URL
-    const url = currentUser.uid === session.tutorId ? session.zoomStartUrl : session.zoomJoinUrl;
+    if (!session.zoomJoinUrl) {
+      setError('Meeting URL not available');
+      return;
+    }
+
+    // For tutors or logged-in users, use the start URL, for anonymous users use the join URL
+    const url = (currentUser && currentUser.uid === session.tutorId) ? session.zoomStartUrl : session.zoomJoinUrl;
     window.open(url, '_blank');
   };
 
@@ -107,6 +116,12 @@ export default function Conference() {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-sm text-red-700">{error}</p>
+          <button
+            onClick={() => navigate('/scheduled-sessions')}
+            className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
+          >
+            Return to Sessions
+          </button>
         </div>
       </div>
     );

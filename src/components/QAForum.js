@@ -1,214 +1,192 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
+// Mock data for questions
+const mockQuestions = [
+  {
+    id: 1,
+    title: 'How to solve quadratic equations?',
+    content: 'I need help understanding the quadratic formula and how to apply it. Can someone explain it step by step?',
+    subject: 'Mathematics',
+    author: 'Sarah M.',
+    date: '2024-04-05',
+    answers: [
+      {
+        id: 1,
+        content: 'The quadratic formula is x = (-b ± √(b²-4ac)) / 2a. Let me break it down step by step:\n\n1. Identify a, b, and c from your equation (ax² + bx + c = 0)\n2. Plug these values into the formula\n3. Calculate the discriminant (b²-4ac)\n4. Use the ± symbol to find both solutions\n5. Simplify your answers',
+        author: 'John D.',
+        date: '2024-04-05',
+        helpfulVotes: 12
+      }
+    ]
+  },
+  {
+    id: 2,
+    title: 'Understanding Newton\'s Laws',
+    content: 'Can someone explain Newton\'s three laws of motion in simple terms? I\'m having trouble understanding the practical applications.',
+    subject: 'Physics',
+    author: 'Mike R.',
+    date: '2024-04-04',
+    answers: [
+      {
+        id: 1,
+        content: 'Here\'s a simple explanation of Newton\'s Laws:\n\n1. First Law (Inertia): An object at rest stays at rest, and an object in motion stays in motion unless acted upon by an external force.\n2. Second Law (F=ma): Force equals mass times acceleration.\n3. Third Law: For every action, there is an equal and opposite reaction.',
+        author: 'Alice J.',
+        date: '2024-04-04',
+        helpfulVotes: 8
+      }
+    ]
+  },
+  {
+    id: 3,
+    title: 'Best resources for learning Python?',
+    content: 'I\'m new to programming and want to learn Python. What are the best resources for beginners?',
+    subject: 'Computer Science',
+    author: 'Bob W.',
+    date: '2024-04-03',
+    answers: [
+      {
+        id: 1,
+        content: 'Here are some great resources for learning Python:\n\n1. Python.org\'s official tutorial\n2. Codecademy\'s Python course\n3. Automate the Boring Stuff with Python (book)\n4. Python for Everybody (Coursera)\n5. Real Python tutorials',
+        author: 'Emma L.',
+        date: '2024-04-03',
+        helpfulVotes: 15
+      }
+    ]
+  }
+];
+
+const subjects = [
+  { id: 'math', name: 'Mathematics', icon: '🔢' },
+  { id: 'science', name: 'Science', icon: '🔬' },
+  { id: 'cs', name: 'Computer Science', icon: '💻' },
+  { id: 'physics', name: 'Physics', icon: '⚛️' },
+  { id: 'chemistry', name: 'Chemistry', icon: '🧪' },
+  { id: 'biology', name: 'Biology', icon: '🧬' },
+  { id: 'english', name: 'English', icon: '📝' },
+  { id: 'history', name: 'History', icon: '🏛️' },
+  { id: 'languages', name: 'Languages', icon: '🌎' }
+];
+
 export default function QAForum() {
-  const { user } = useAuth();
+  const { currentUser } = useAuth();
+  const [questions, setQuestions] = useState(mockQuestions);
+  const [newQuestion, setNewQuestion] = useState({ title: '', content: '', subject: 'math' });
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [showOverlay, setShowOverlay] = useState(false);
-  const [newQuestion, setNewQuestion] = useState('');
-  const [newAnswer, setNewAnswer] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
 
-  const categories = [
-    { id: 'all', name: 'All Questions', icon: '📚' },
-    { id: 'math', name: 'Mathematics', icon: '🔢' },
-    { id: 'science', name: 'Science', icon: '🔬' },
-    { id: 'english', name: 'English', icon: '📝' },
-    { id: 'cs', name: 'Computer Science', icon: '💻' },
-    { id: 'physics', name: 'Physics', icon: '⚛️' },
-  ];
+  const handleSubmitQuestion = () => {
+    if (!newQuestion.title.trim() || !newQuestion.content.trim()) return;
 
-  const [questions, setQuestions] = useState([
-    {
-      id: 1,
-      title: 'How to solve quadratic equations?',
-      content: 'I\'m having trouble understanding how to solve quadratic equations using the quadratic formula. Can someone explain it step by step?',
-      author: 'John Doe',
-      date: '2024-03-15',
-      category: 'math',
-      votes: 15,
-      answers: [
-        {
-          id: 1,
-          content: 'The quadratic formula is x = (-b ± √(b² - 4ac)) / 2a. Let me break it down step by step...',
-          author: 'Jane Smith',
-          date: '2024-03-15'
-        }
-      ],
-      solved: true
-    },
-    {
-      id: 2,
-      title: 'Best resources for learning Python?',
-      content: 'I\'m new to programming and want to learn Python. What are the best resources for beginners?',
-      author: 'Alice Johnson',
-      date: '2024-03-14',
-      category: 'cs',
-      votes: 8,
-      answers: [
-        {
-          id: 1,
-          content: 'I recommend starting with Python.org\'s official tutorial and then moving to Codecademy\'s Python course.',
-          author: 'Bob Wilson',
-          date: '2024-03-14'
-        }
-      ],
-      solved: false
-    }
-  ]);
+    const question = {
+      id: questions.length + 1,
+      title: newQuestion.title,
+      content: newQuestion.content,
+      subject: newQuestion.subject,
+      author: currentUser?.displayName || 'Anonymous User',
+      date: new Date().toISOString().split('T')[0],
+      answers: []
+    };
 
-  const filteredQuestions = questions.filter(question => 
-    (selectedCategory === 'all' || question.category === selectedCategory) &&
-    (searchQuery === '' || question.title.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+    setQuestions([question, ...questions]);
+    setNewQuestion({ title: '', content: '', subject: 'math' });
+  };
 
   const handleQuestionClick = (question) => {
     setSelectedQuestion(question);
     setShowOverlay(true);
   };
 
-  const handleSubmitQuestion = (e) => {
-    e.preventDefault();
-    if (!newQuestion.trim()) return;
-
-    const question = {
-      id: questions.length + 1,
-      title: newQuestion,
-      content: newQuestion,
-      author: user?.displayName || 'Anonymous',
-      date: new Date().toISOString().split('T')[0],
-      category: selectedCategory,
-      votes: 0,
-      answers: [],
-      solved: false
-    };
-
-    setQuestions([question, ...questions]);
-    setNewQuestion('');
-  };
-
-  const handleSubmitAnswer = (e) => {
-    e.preventDefault();
-    if (!newAnswer.trim() || !selectedQuestion) return;
-
-    const answer = {
-      id: selectedQuestion.answers.length + 1,
-      content: newAnswer,
-      author: user?.displayName || 'Anonymous',
-      date: new Date().toISOString().split('T')[0]
-    };
-
-    const updatedQuestions = questions.map(q => {
-      if (q.id === selectedQuestion.id) {
-        return {
-          ...q,
-          answers: [...q.answers, answer]
-        };
-      }
-      return q;
-    });
-
-    setQuestions(updatedQuestions);
-    setSelectedQuestion(updatedQuestions.find(q => q.id === selectedQuestion.id));
-    setNewAnswer('');
-  };
-
   return (
-    <div className="h-[calc(100vh-5rem)] bg-[#F8FAFC] flex">
-      {/* Categories Sidebar */}
-      <div className="w-64 bg-white border-r border-gray-200 flex flex-col overflow-hidden">
+    <div className="h-[calc(100vh-8rem)] bg-[#F8FAFC] flex">
+      {/* Subject Sidebar */}
+      <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
         <div className="px-4 py-4">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">Categories</h2>
-          <p className="text-sm text-gray-600">Browse questions by subject</p>
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">Subjects</h2>
+          <p className="text-sm text-gray-600">Select a subject to filter questions</p>
         </div>
         <nav className="flex-1 overflow-y-auto px-2 pb-4">
-          {categories.map((category) => (
+          {subjects.map((subject) => (
             <button
-              key={category.id}
-              onClick={() => setSelectedCategory(category.id)}
+              key={subject.id}
+              onClick={() => setNewQuestion({ ...newQuestion, subject: subject.id })}
               className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg mb-1 ${
-                selectedCategory === category.id
+                newQuestion.subject === subject.id
                   ? 'bg-blue-50 text-[#3B82F6]'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <span className="text-xl mr-3">{category.icon}</span>
-              {category.name}
+              <span className="text-xl mr-3">{subject.icon}</span>
+              {subject.name}
             </button>
           ))}
         </nav>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold text-gray-900 flex items-center">
-              Q&A Forum
-              <span className="ml-2 text-sm font-normal text-gray-500 flex items-center">
-                <span className="text-lg mr-1">
-                  {categories.find(c => c.id === selectedCategory).icon}
-                </span>
-                {categories.find(c => c.id === selectedCategory).name}
+          <h1 className="text-xl font-bold text-gray-900 flex items-center">
+            Q&A Forum
+            <span className="ml-2 text-sm font-normal text-gray-500 flex items-center">
+              <span className="text-lg mr-1">
+                {subjects.find(s => s.id === newQuestion.subject)?.icon}
               </span>
-            </h1>
-            <button className="inline-flex justify-center py-2 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-[#3B82F6] hover:bg-[#2563EB] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-              Ask Question
-            </button>
-          </div>
-          <div className="mt-4">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search questions..."
-              className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2"
-            />
-          </div>
+              {subjects.find(s => s.id === newQuestion.subject)?.name}
+            </span>
+          </h1>
         </div>
 
-        {/* Questions List */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="divide-y divide-gray-200">
-            {filteredQuestions.map((question) => (
+        {/* Content Area */}
+        <div className="flex-1 overflow-y-auto p-6">
+          {/* New Question Form */}
+          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Ask a Question</h2>
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Question Title"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                value={newQuestion.title}
+                onChange={(e) => setNewQuestion({ ...newQuestion, title: e.target.value })}
+              />
+              <textarea
+                placeholder="Your question..."
+                rows={4}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                value={newQuestion.content}
+                onChange={(e) => setNewQuestion({ ...newQuestion, content: e.target.value })}
+              />
+              <button
+                onClick={handleSubmitQuestion}
+                className="bg-[#3B82F6] text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                Post Question
+              </button>
+            </div>
+          </div>
+
+          {/* Questions List */}
+          <div className="space-y-4">
+            {questions.map((question) => (
               <div
                 key={question.id}
                 onClick={() => handleQuestionClick(question)}
-                className="p-6 hover:bg-gray-50 transition-colors cursor-pointer"
+                className="bg-white rounded-lg shadow-sm p-6 cursor-pointer hover:shadow-md transition-shadow"
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-lg">
-                        {categories.find(c => c.id === question.category).icon}
-                      </span>
-                      <h3 className="text-lg font-medium text-gray-900">
-                        {question.title}
-                      </h3>
-                      {question.solved && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          Solved
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-2 flex items-center space-x-4 text-sm text-gray-500">
-                      <span>by {question.author}</span>
-                      <span>•</span>
-                      <span>{question.date}</span>
-                    </div>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">{question.title}</h3>
+                    <p className="text-gray-600 mt-2 line-clamp-2">{question.content}</p>
                   </div>
-                  <div className="flex items-center space-x-4 text-sm">
-                    <div className="flex items-center space-x-1 text-gray-500">
-                      <span>👍</span>
-                      <span>{question.votes}</span>
-                    </div>
-                    <div className="flex items-center space-x-1 text-gray-500">
-                      <span>💬</span>
-                      <span>{question.answers.length}</span>
-                    </div>
-                  </div>
+                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                    {question.subject}
+                  </span>
+                </div>
+                <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
+                  <span>Asked by {question.author} on {question.date}</span>
+                  <span>{question.answers.length} {question.answers.length === 1 ? 'Answer' : 'Answers'}</span>
                 </div>
               </div>
             ))}
@@ -216,56 +194,10 @@ export default function QAForum() {
         </div>
       </div>
 
-      {/* Stats Panel */}
-      <div className="w-64 bg-white border-l border-gray-200 flex flex-col overflow-hidden">
-        <div className="p-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Stats</h2>
-        </div>
-        <div className="flex-1 overflow-y-auto p-4">
-          <div className="space-y-4">
-            <div className="bg-blue-50 rounded-lg p-3">
-              <h3 className="text-sm font-medium text-blue-800 mb-2">Your Activity</h3>
-              <div className="space-y-2 text-sm text-blue-600">
-                <div className="flex justify-between">
-                  <span>Questions Asked</span>
-                  <span>5</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Answers Given</span>
-                  <span>12</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Helpful Votes</span>
-                  <span>28</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-gray-50 rounded-lg p-3">
-              <h3 className="text-sm font-medium text-gray-800 mb-2">Top Contributors</h3>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm text-gray-600">
-                  <span>Sarah M.</span>
-                  <span>152 pts</span>
-                </div>
-                <div className="flex items-center justify-between text-sm text-gray-600">
-                  <span>John D.</span>
-                  <span>98 pts</span>
-                </div>
-                <div className="flex items-center justify-between text-sm text-gray-600">
-                  <span>Mike R.</span>
-                  <span>87 pts</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Question Overlay */}
+      {/* Question Detail Overlay */}
       {showOverlay && selectedQuestion && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] flex flex-col">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
             <div className="p-6 border-b border-gray-200">
               <div className="flex justify-between items-start">
                 <h2 className="text-2xl font-bold text-gray-900">{selectedQuestion.title}</h2>
@@ -280,49 +212,36 @@ export default function QAForum() {
               </div>
               <p className="text-gray-600 mt-4">{selectedQuestion.content}</p>
               <div className="flex items-center justify-between text-sm text-gray-500 mt-4">
-                <span>By {selectedQuestion.author}</span>
+                <span>Asked by {selectedQuestion.author}</span>
                 <span>{selectedQuestion.date}</span>
               </div>
             </div>
 
-            {/* Scrollable Content */}
+            {/* Answers Section */}
             <div className="flex-1 overflow-y-auto px-6 py-4">
-              {/* Answers Section */}
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                {selectedQuestion.answers.length} {selectedQuestion.answers.length === 1 ? 'Answer' : 'Answers'}
+              </h3>
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  {selectedQuestion.answers.length} {selectedQuestion.answers.length === 1 ? 'Answer' : 'Answers'}
-                </h3>
                 {selectedQuestion.answers.map((answer) => (
                   <div key={answer.id} className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-gray-600 mb-2">{answer.content}</p>
-                    <div className="flex items-center justify-between text-sm text-gray-500">
-                      <span>By {answer.author}</span>
-                      <span>{answer.date}</span>
+                    <p className="text-gray-600 whitespace-pre-line">{answer.content}</p>
+                    <div className="flex items-center justify-between mt-4">
+                      <div className="flex items-center space-x-2">
+                        <button className="text-blue-600 hover:text-blue-800">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                          </svg>
+                        </button>
+                        <span className="text-sm text-gray-500">{answer.helpfulVotes} helpful</span>
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        Answered by {answer.author} on {answer.date}
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
-
-            {/* Fixed Bottom Form */}
-            <div className="p-6 border-t border-gray-200 bg-white">
-              <form onSubmit={handleSubmitAnswer} className="space-y-4">
-                <div>
-                  <textarea
-                    value={newAnswer}
-                    onChange={(e) => setNewAnswer(e.target.value)}
-                    placeholder="Write your answer..."
-                    className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-4"
-                    rows={3}
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="inline-flex justify-center py-2 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-[#3B82F6] hover:bg-[#2563EB] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Post Answer
-                </button>
-              </form>
             </div>
           </div>
         </div>

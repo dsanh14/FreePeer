@@ -1,51 +1,58 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
 export default function Onboarding() {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
-  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    grade: '',
+    displayName: '',
+    bio: '',
     subjects: [],
-    learningStyle: '',
-    preferredTutorGender: '',
-    preferredTutorAge: '',
-    preferredSessionLength: '',
-    preferredSessionTime: '',
-    additionalInfo: '',
-    goals: '',
-    availability: {
-      monday: false,
-      tuesday: false,
-      wednesday: false,
-      thursday: false,
-      friday: false,
-      saturday: false,
-      sunday: false
-    },
-    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+    gradeLevel: '',
+    learningGoals: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const subjects = [
     'Mathematics',
-    'Physics',
-    'Chemistry',
-    'Biology',
+    'Science',
     'English',
     'History',
     'Computer Science',
-    'Economics',
-    'Psychology',
-    'Spanish',
-    'French',
-    'German',
+    'Foreign Languages',
     'Art',
-    'Music'
+    'Music',
+    'Physical Education'
   ];
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.displayName || !formData.gradeLevel) {
+      return setError('Please fill in all required fields');
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+
+      // Update user document in Firestore
+      await updateDoc(doc(db, 'users', currentUser.uid), {
+        ...formData,
+        onboardingCompleted: true
+      });
+
+      // Redirect to home page
+      navigate('/home');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -64,237 +71,124 @@ export default function Onboarding() {
     }));
   };
 
-  const handleAvailabilityChange = (day) => {
-    setFormData(prev => ({
-      ...prev,
-      availability: {
-        ...prev.availability,
-        [day]: !prev.availability[day]
-      }
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (!currentUser) {
-        throw new Error('No user logged in');
-      }
-
-      // Save user preferences to Firestore
-      await setDoc(doc(db, 'users', currentUser.uid), {
-        ...formData,
-        onboardingCompleted: true,
-        lastUpdated: new Date()
-      }, { merge: true });
-
-      navigate('/home');
-    } catch (error) {
-      console.error('Error saving user preferences:', error);
-    }
-  };
-
-  const renderStep = () => {
-    switch (step) {
-      case 1:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Basic Information</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Grade Level</label>
-                <select
-                  name="grade"
-                  value={formData.grade}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                >
-                  <option value="">Select your grade</option>
-                  <option value="middle-school">Middle School</option>
-                  <option value="high-school">High School</option>
-                  <option value="college">College</option>
-                  <option value="adult-learner">Adult Learner</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Subjects of Interest</label>
-                <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                  {subjects.map((subject) => (
-                    <button
-                      key={subject}
-                      type="button"
-                      onClick={() => handleSubjectToggle(subject)}
-                      className={`px-3 py-2 rounded-md text-sm font-medium ${
-                        formData.subjects.includes(subject)
-                          ? 'bg-primary-600 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {subject}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 2:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Learning Preferences</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Learning Style</label>
-                <select
-                  name="learningStyle"
-                  value={formData.learningStyle}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                >
-                  <option value="">Select your preferred learning style</option>
-                  <option value="visual">Visual Learner</option>
-                  <option value="auditory">Auditory Learner</option>
-                  <option value="kinesthetic">Kinesthetic Learner</option>
-                  <option value="reading-writing">Reading/Writing Learner</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Preferred Session Length</label>
-                <select
-                  name="preferredSessionLength"
-                  value={formData.preferredSessionLength}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                >
-                  <option value="">Select preferred session length</option>
-                  <option value="30">30 minutes</option>
-                  <option value="45">45 minutes</option>
-                  <option value="60">1 hour</option>
-                  <option value="90">1.5 hours</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Preferred Session Time</label>
-                <select
-                  name="preferredSessionTime"
-                  value={formData.preferredSessionTime}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                >
-                  <option value="">Select preferred session time</option>
-                  <option value="morning">Morning (8AM - 12PM)</option>
-                  <option value="afternoon">Afternoon (12PM - 5PM)</option>
-                  <option value="evening">Evening (5PM - 9PM)</option>
-                  <option value="night">Night (9PM - 12AM)</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 3:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Availability</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-4">Select your available days</label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                  {Object.keys(formData.availability).map((day) => (
-                    <button
-                      key={day}
-                      type="button"
-                      onClick={() => handleAvailabilityChange(day)}
-                      className={`px-3 py-2 rounded-md text-sm font-medium ${
-                        formData.availability[day]
-                          ? 'bg-primary-600 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {day.charAt(0).toUpperCase() + day.slice(1)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Learning Goals</label>
-                <textarea
-                  name="goals"
-                  value={formData.goals}
-                  onChange={handleChange}
-                  rows={3}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                  placeholder="What are your main learning goals?"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Additional Information</label>
-                <textarea
-                  name="additionalInfo"
-                  value={formData.additionalInfo}
-                  onChange={handleChange}
-                  rows={3}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                  placeholder="Any additional information that might help match you with the right tutor..."
-                />
-              </div>
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow-sm p-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to FreePeer!</h1>
-            <p className="text-gray-600">Let's get to know you better to find the perfect tutor match.</p>
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-extrabold text-gray-900">
+            Welcome to FreePeer!
+          </h1>
+          <p className="mt-2 text-lg text-gray-600">
+            Let's set up your profile to help you get the most out of FreePeer.
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="bg-white shadow rounded-lg p-6">
+          {error && (
+            <div className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
+
+          <div className="space-y-6">
+            <div>
+              <label htmlFor="displayName" className="block text-sm font-medium text-gray-700">
+                Display Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="displayName"
+                id="displayName"
+                required
+                value={formData.displayName}
+                onChange={handleChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="bio" className="block text-sm font-medium text-gray-700">
+                Bio
+              </label>
+              <textarea
+                name="bio"
+                id="bio"
+                rows={3}
+                value={formData.bio}
+                onChange={handleChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                placeholder="Tell us a bit about yourself..."
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Subjects of Interest <span className="text-red-500">*</span>
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {subjects.map((subject) => (
+                  <button
+                    key={subject}
+                    type="button"
+                    onClick={() => handleSubjectToggle(subject)}
+                    className={`px-4 py-2 rounded-md text-sm font-medium ${
+                      formData.subjects.includes(subject)
+                        ? 'bg-primary-100 text-primary-700 border border-primary-300'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {subject}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="gradeLevel" className="block text-sm font-medium text-gray-700">
+                Grade Level <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="gradeLevel"
+                id="gradeLevel"
+                required
+                value={formData.gradeLevel}
+                onChange={handleChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+              >
+                <option value="">Select your grade level</option>
+                <option value="High School">High School</option>
+                <option value="College">College</option>
+                <option value="Graduate">Graduate</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="learningGoals" className="block text-sm font-medium text-gray-700">
+                Learning Goals
+              </label>
+              <textarea
+                name="learningGoals"
+                id="learningGoals"
+                rows={3}
+                value={formData.learningGoals}
+                onChange={handleChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                placeholder="What are your learning goals?"
+              />
+            </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {renderStep()}
-
-            <div className="flex justify-between pt-6">
-              {step > 1 && (
-                <button
-                  type="button"
-                  onClick={() => setStep(step - 1)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Previous
-                </button>
-              )}
-              
-              {step < 3 ? (
-                <button
-                  type="button"
-                  onClick={() => setStep(step + 1)}
-                  className="ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
-                >
-                  Next
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  className="ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
-                >
-                  Complete Setup
-                </button>
-              )}
-            </div>
-          </form>
-        </div>
+          <div className="mt-6">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            >
+              {loading ? 'Saving...' : 'Complete Profile'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
