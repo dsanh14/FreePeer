@@ -16,6 +16,7 @@ import Games from './components/Games';
 import TextRPG from './components/TextRPG';
 import MatchingGame from './components/MatchingGame';
 import TutorProfile from './components/TutorProfile';
+import TutorOnboarding from './components/TutorOnboarding';
 import QAForum from './components/QAForum';
 import Profile from './components/Profile';
 
@@ -39,6 +40,7 @@ function AppRoutes() {
       <Route path="/games/text-rpg" element={currentUser ? <TextRPG /> : <Navigate to="/login" />} />
       <Route path="/games/matching" element={currentUser ? <MatchingGame /> : <Navigate to="/login" />} />
       <Route path="/tutor-profile" element={userData?.role === 'tutor' ? <TutorProfile /> : <Navigate to="/dashboard" />} />
+      <Route path="/tutor-onboarding" element={userData?.role === 'tutor' ? <TutorOnboarding /> : <Navigate to="/dashboard" />} />
       <Route path="/profile" element={currentUser ? <Profile /> : <Navigate to="/login" />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
